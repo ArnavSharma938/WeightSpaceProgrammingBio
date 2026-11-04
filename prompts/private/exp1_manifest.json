@@ -1,0 +1,82 @@
+{
+  "private_do_not_submit": true,
+  "created_at": "2026-11-04T20:36:31.469350+00:00",
+  "permutation_seed_hex": "d85778ddaeab2490f0ccea4ccb65c34f702155c9d5daaa3549766a3fb2b9db44",
+  "permutation": [
+    1,
+    0,
+    2
+  ],
+  "rounding": "Python float .3f formatting; nearest, ties-to-even; negative zero retained",
+  "template_sha256": "d8c2e97b2751e95bdc5e99f9fef7d0c68c5809b1fde30e6b72b85c6dc0ec10ba",
+  "exporter_sha256": "ae39148ec3979a446c070485b44e9636a76b9b9dcb9f02758ab816d7f8a54166",
+  "repository_source_sha256": {
+    "model.py": "6671af065b90fe453837c1302aaa6fbc6ccecd252745131d580e3b3b74ce9962",
+    "common.py": "cfdb5eafc056876f1afb77d5fd971c3a55faf4f3da55738b67a30b81d15d547a",
+    "training.py": "542e2180c8d7c7a9cc59706052a011f001c372f90e2b57b1b6c55cecfbccbd38",
+    "data.py": "57aeace9dca9ed38bf7cb99e3c6e61dd0925e3145a5d037ed929f84a0696b13b"
+  },
+  "torch_version": "2.15.0+cpu",
+  "models": [
+    {
+      "id": "model_001",
+      "prompt_file": "model_001.txt",
+      "task": "transmembrane",
+      "checkpoint": "runs/seed_20261103/transmembrane/checkpoints/best_state_dict.pt",
+      "checkpoint_sha256": "b8a05efc618d5b0f511b8b508bfd3c09961d5e181db4624e31b0ad77e69c710c",
+      "prompt_sha256": "2f1599520e5a471b1ce93ce86a73ed92fe143f50b6fe2dd6a24fda369c0dcda0",
+      "prompt_bytes": 172524,
+      "prompt_characters": 172524,
+      "coverage": {
+        "W1": 4704,
+        "b1": 32,
+        "W2": 7168,
+        "b2": 32,
+        "W3": 4480,
+        "b3": 2
+      },
+      "tensor_count": 6,
+      "scalar_count": 16418
+    },
+    {
+      "id": "model_002",
+      "prompt_file": "model_002.txt",
+      "task": "signal_peptide",
+      "checkpoint": "runs/seed_20261103/signal_peptide/checkpoints/best_state_dict.pt",
+      "checkpoint_sha256": "ac473296ef25f7dd3a7b6ef9fd355aad1550aceec69b67447437b08a174b142b",
+      "prompt_sha256": "b254574c48361a5a7e414cccdfb6e67fb9c7855cd948b4cc440da05b4f1389cf",
+      "prompt_bytes": 172353,
+      "prompt_characters": 172353,
+      "coverage": {
+        "W1": 4704,
+        "b1": 32,
+        "W2": 7168,
+        "b2": 32,
+        "W3": 4480,
+        "b3": 2
+      },
+      "tensor_count": 6,
+      "scalar_count": 16418
+    },
+    {
+      "id": "model_003",
+      "prompt_file": "model_003.txt",
+      "task": "coiled_coil",
+      "checkpoint": "runs/seed_20261103/coiled_coil/checkpoints/best_state_dict.pt",
+      "checkpoint_sha256": "7445e085784d6a3891fbe640ba2c788c3b679464b292d30968c652aea921db73",
+      "prompt_sha256": "b08926ec158da9aa7fdc22ce9838d72b69dd78bf4bd487ab602d60ec9cf704f3",
+      "prompt_bytes": 172473,
+      "prompt_characters": 172473,
+      "coverage": {
+        "W1": 4704,
+        "b1": 32,
+        "W2": 7168,
+        "b2": 32,
+        "W3": 4480,
+        "b3": 2
+      },
+      "tensor_count": 6,
+      "scalar_count": 16418
+    }
+  ]
+}

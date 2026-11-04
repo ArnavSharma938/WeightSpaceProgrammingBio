@@ -7,6 +7,29 @@ tools. It has no Python package dependencies and does not import the CNN code.
 See [runner/README.md](runner/README.md) for exact PowerShell commands,
 isolation checks, logging, retries, and restart recovery.
 
+## Prepare Experiment 1 inputs
+
+```powershell
+.\.venv\Scripts\python.exe scripts\prepare_reasoning_inputs.py --out prompts/exp1
+```
+
+This exports the three existing best checkpoints as `model_001.txt` through
+`model_003.txt`, each with the supplied experimental prose and all 16,418
+parameters rounded to three decimals. It verifies architecture and encoding,
+loads only CPU weights, and parses every exported index and scalar back against
+the checkpoint. It does not evaluate a CNN or invoke Codex.
+
+The random permutation, checkpoint identities/hashes, prompt hashes, and coverage
+are saved separately in `prompts/private/exp1_manifest.json`. Keep that manifest
+private and never submit it as an experimental message. Existing output or a
+private manifest causes the exporter to stop rather than overwrite either.
+
+Exporter tests (no network, inference, or Codex):
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p test_prepare_reasoning_inputs.py -v
+```
+
 This project implements and trains only the three CNN classifiers specified in
 `Experiment 1 CNN (also experiment 4)` of the supplied experiment packet:
 
