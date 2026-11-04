@@ -1,0 +1,9 @@
+{"type":"thread.started","thread_id":"01a1a6d6-4f6c-77f0-9655-b4fef3059317"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"`[features].use_legacy_landlock` is deprecated and will be removed soon. (Remove this setting to stop opting into the legacy Linux sandbox behavior.)"}}
+{"type":"item.completed","item":{"id":"item_1","type":"error","message":"`[features].web_search_cached` is deprecated because web search is enabled by default. (Set `web_search` to `\"live\"`, `\"indexed\"`, `\"cached\"`, or `\"disabled\"` at the top level (or under a profile) in config.toml if you want to override it.)"}}
+{"type":"item.completed","item":{"id":"item_2","type":"error","message":"`[features].web_search_request` is deprecated because web search is enabled by default. (Set `web_search` to `\"live\"`, `\"indexed\"`, `\"cached\"`, or `\"disabled\"` at the top level (or under a profile) in config.toml if you want to override it.)"}}
+{"type":"item.completed","item":{"id":"item_3","type":"error","message":"Under-development features enabled: skip_host_skill_discovery. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in C:\\Users\\arnav.DHEERAJACER\\.codex\\config.toml."}}
+{"type":"item.completed","item":{"id":"item_4","type":"error","message":"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_5","type":"agent_message","text":"WEIGHT_SPACE_SMOKE_OK"}}
+{"type":"turn.completed","usage":{"input_tokens":2238,"cached_input_tokens":2048,"cache_write_input_tokens":0,"output_tokens":10,"reasoning_output_tokens":0}}

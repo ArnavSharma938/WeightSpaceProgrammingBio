@@ -39,8 +39,9 @@ These are **custom runner and Python test commands**:
 `check` performs offline version/flag/model-catalog checks and local prompt
 inspection with a synthetic message. It makes no inference request and sends
 no experimental prompt. Account access to the requested model is determined
-only on your first real submission. The test command mocks every experimental
-Codex process and needs no login or internet.
+only by a live submission. A harmless smoke submission passed on this machine
+on 2026-11-04; its artifacts are in `runs/pure_reasoning/smoke_20261104`.
+The test command mocks every Codex process and needs no login or internet.
 
 Submit your separately prepared prompt (the file must already exist):
 
@@ -83,14 +84,16 @@ Optional process/retry controls (also accepted by `resume`):
 .\.venv\Scripts\python.exe runner\pure_reasoning.py run --run-dir runs\pure_reasoning\batch02 --timeout 1800 --retries 3 --backoff 10 --usage-recheck 3600 'C:\Users\arnav.DHEERAJACER\Downloads\prepared_prompt.txt'
 ```
 
-Timeout is seconds per process. Retries means additional failed-infrastructure
-attempts per unfinished input in this invocation. Transient failures use
-exponential backoff capped at 300 seconds. A reported usage reset epoch,
+Timeout is seconds per process. `--retries` limits additional transient-failure
+attempts per input across restarts; increasing it on `resume` extends the saved
+allowance. **Quota waits are unlimited and do not consume that allowance.**
+Transient failures use exponential backoff capped at 300 seconds. A reported usage reset epoch,
 timezone-qualified ISO timestamp, or explicit relative delay is honored. If
 the reset cannot be parsed unambiguously, wait one hour before submitting the
 same prompt in a fresh attempt. This conservative policy is configurable with
-`--usage-recheck`; it is not a polling conversation. Wait deadlines survive
-restart, including when retries are exhausted. Authentication/configuration
+`--usage-recheck`; it is not a polling conversation. Already-expired reported
+resets also use this conservative interval to avoid rapid repeated requests.
+Wait deadlines survive restart, including when transient retries are exhausted. Authentication/configuration
 failures stop immediately; unexplained incomplete requests stop for inspection.
 A refusal, uncertain response, or wrong answer is completed and never retried.
 
@@ -144,19 +147,46 @@ batch01/
       attempt.json                status, hash, timestamps, exit code, usage, audit
 ```
 
-Only `agent_message` and `reasoning` items pass the event audit. All other item
-types, native call metadata, unknown events, and malformed JSONL invalidate the
-attempt. Invalid inputs are terminal and require manual review; they are never
+`agent_message`, `reasoning`, and CLI diagnostic `error` items pass the event
+audit. Diagnostic messages are retained for failure classification. Native call
+items/metadata, unknown events, and malformed complete JSONL records invalidate
+the attempt. A truncated final record (including partial UTF-8) makes the audit
+incomplete and is recoverable when no completed answer or confirmed violation
+exists. A completed answer with an incomplete audit is terminal-invalid and
+is never resubmitted. Invalid inputs are terminal and require manual review; they are never
 automatically rerun. Every attempt directory is preserved. An answer file
 written by Codex or an agent message plus `turn.completed` ends the input even
 if cleanup later exits nonzero. Partial messages without a completion signal
 remain incomplete and use a separate `partial_answer.txt` file.
 
-Run state is committed after each request and before a wait. Recovery checks
-attempt artifacts before scheduling another request, including the crash
-window after a completed answer but before the ledger update. An OS-backed
+Each attempt record commits its outcome, failure timestamp, retry policy,
+transient-failure count, and next permitted attempt time before the batch ledger
+is updated. Execution and recovery share the same outcome/scheduling function.
+The ledger is reconstructed from attempt records after a crash, including quota
+failures saved before a ledger update and raw failures captured before outcome
+classification. Older invalid attempts with only a truncated tail are re-audited
+and become recoverable; superseded audits remain in `audit_history`. Recovery
+checks attempt artifacts before scheduling another request. An OS-backed
 exclusive lock prevents two instances from processing the same run directory.
 Do not manually modify run artifacts while resuming.
 
 Exit codes: 0 finished/check passed; 2 setup/infrastructure/manual-inspection
 stop; 130 interrupted. Status and validity must still be read in the ledger.
+
+## Recorded live smoke test
+
+Exactly one live request was submitted through this runner with CLI 0.164.0,
+the required model/effort, and the unchanged isolation policy:
+`tests/fixtures/smoke_prompt.txt` asks for `WEIGHT_SPACE_SMOKE_OK`.
+It returned that exact answer, exited 0, and passed the final tool audit.
+CLI startup diagnostics initially caused a conservative audit rejection; the
+parser was corrected to recognize diagnostic items and the existing response
+was re-audited. It was not submitted again. `resume` confirmed that the finished
+input was skipped; the run contains one attempt directory.
+
+To inspect the saved smoke evidence without launching a request:
+
+```powershell
+.\.venv\Scripts\python.exe runner\pure_reasoning.py status --run-dir runs\pure_reasoning\smoke_20261104
+Get-Content runs\pure_reasoning\smoke_20261104\001-3e6cfb79cb03\attempt-001\attempt.json -Raw
+```

@@ -185,17 +185,26 @@ def audit(path):
     violations = []
     completed = False
     counts = {}
-    allowed_items = {"agent_message", "reasoning"}
+    truncated = None
+    # CLI 0.164 also emits startup/config diagnostics as item.type="error".
+    # They carry messages, not native tool execution. Keep them for failure
+    # classification without confusing them with command/MCP/browser items.
+    allowed_items = {"agent_message", "reasoning", "error"}
     allowed_events = {"thread.started", "turn.started", "turn.completed", "turn.failed", "error",
                       "item.started", "item.updated", "item.completed"}
     if path.exists():
-        for number, line in enumerate(path.read_bytes().splitlines(), 1):
+        raw = path.read_bytes()
+        lines = raw.splitlines(keepends=True)
+        for number, line in enumerate(lines, 1):
             try:
                 event = json.loads(line)
                 if not isinstance(event, dict):
                     raise ValueError("non-object event")
             except (ValueError, UnicodeDecodeError):
-                violations.append(f"Malformed JSONL line {number}")
+                if number == len(lines) and not line.endswith(b"\n"):
+                    truncated = {"line": number, "bytes": len(line)}
+                else:
+                    violations.append(f"Malformed JSONL line {number}")
                 continue
             kind = event.get("type")
             counts[kind] = counts.get(kind, 0) + 1
@@ -214,6 +223,8 @@ def audit(path):
                 item = event["item"]
                 if not isinstance(item, dict) or item.get("type") not in allowed_items:
                     violations.append(f"Native tool or unknown item: {item.get('type') if isinstance(item, dict) else item}")
+                elif item["type"] == "error":
+                    errors.append(event)
                 elif kind == "item.completed" and item["type"] == "agent_message":
                     answer.append(item.get("text", ""))
             # Additional wire formats are also checked, including nested calls.
@@ -222,7 +233,8 @@ def audit(path):
                 violations.append(f"Native call metadata at line {number}")
     return {"turn_completed": completed, "answer": "\n\n".join(answer),
             "usage": usage, "errors": errors, "violations": violations,
-            "tool_free": not violations}
+            "truncated_tail": truncated, "audit_complete": not violations and truncated is None,
+            "tool_free": not violations and truncated is None}
 
 
 def classify(text, timed_out=False):
@@ -243,11 +255,13 @@ def reset_time(text, now, fallback):
     match = re.search(r'"?(?:resets_at|reset_at|reset_timestamp)"?\s*[:=]\s*"?(\d{10,13})', text)
     if match:
         value = float(match[1])
-        return max(now + 1, value / 1000 if value > 1e12 else value)
+        deadline = value / 1000 if value > 1e12 else value
+        return deadline if deadline > now else now + fallback
     match = re.search(r'(\d{4}-\d\d-\d\d[T ][\d:.]+(?:Z|[+-]\d\d:\d\d))', text)
     if match:
         try:
-            return max(now + 1, dt.datetime.fromisoformat(match[1].replace("Z", "+00:00")).timestamp())
+            deadline = dt.datetime.fromisoformat(match[1].replace("Z", "+00:00")).timestamp()
+            return deadline if deadline > now else now + fallback
         except ValueError:
             pass
     match = re.search(r'(?:retry.after|try again in)\D{0,8}(\d+)\s*(seconds?|minutes?|hours?|s\b|m\b|h\b)', text, re.I)
@@ -271,12 +285,89 @@ def stop_process(process):
         process.wait()
 
 
-def attempt(cli, settings, prompt, directory, timeout):
+def retry_policy(args):
+    return {"transient_retries": args.retries, "backoff": args.backoff,
+            "usage_recheck": args.usage_recheck}
+
+
+def outcome(directory, result, policy, transient_failures=0):
+    """One durable outcome/schedule calculation, shared by execution and recovery.
+
+    attempt.json is authoritative; state.json is a reconstructable batch index.
+    Quota waits are unlimited and never spend the transient retry allowance.
+    """
+    parsed = audit(directory / "events.jsonl")
+    final = directory / "answer.txt"
+    final_exists = final.exists() and bool(final.read_bytes())
+    completed = final_exists or (parsed["turn_completed"] and bool(parsed["answer"]))
+    stderr_path = directory / "stderr.txt"
+    stderr = stderr_path.read_text(encoding="utf-8", errors="replace") if stderr_path.exists() else ""
+    def strings(value):
+        if isinstance(value, str):
+            yield value
+        elif isinstance(value, dict):
+            for child in value.values():
+                yield from strings(child)
+        elif isinstance(value, list):
+            for child in value:
+                yield from strings(child)
+    failure_text = stderr + json.dumps(parsed["errors"]) + "\n" + "\n".join(strings(parsed["errors"]))
+    failure = classify(failure_text, result.get("timed_out", False))
+    # Older attempts with no error records still retain their known failure class.
+    if failure == "incomplete" and result.get("status") in {"usage_limit", "transient", "authentication", "unsupported_configuration"}:
+        failure = result["status"]
+    status = ("invalid" if not parsed["audit_complete"] else "completed") if completed else (
+        "invalid" if parsed["violations"] else failure if failure in {"usage_limit", "authentication", "unsupported_configuration"} else
+        "interrupted" if result.get("interrupted") or result.get("status") == "interrupted" else
+        "transient" if parsed["truncated_tail"] else failure)
+    if not completed and result.get("status") == "running" and result.get("process_exit_status") is None and status == "incomplete":
+        status = "interrupted"
+    if not final_exists and parsed["answer"]:
+        target = final if completed else directory / "partial_answer.txt"
+        target.write_text(parsed["answer"], encoding="utf-8", newline="")
+    failures = transient_failures + (status == "transient")
+    if "audit" in result and (result["audit"] != parsed or result.get("status") != status):
+        result.setdefault("audit_history", []).append({"status": result.get("status"),
+                                                       "audit": result["audit"], "superseded_at": stamp()})
+    result.update(status=status, audit=parsed, recovery_policy=policy,
+                  transient_failures=failures)
+    if "finished_at_epoch" not in result:
+        try:
+            finished = dt.datetime.fromisoformat(result["ended_at"]).timestamp()
+        except (KeyError, ValueError):
+            finished = time.time()
+        result["finished_at_epoch"] = finished
+    result.setdefault("ended_at", dt.datetime.fromtimestamp(result["finished_at_epoch"], dt.timezone.utc).isoformat())
+    if status == "usage_limit":
+        result.setdefault("next_attempt_at", reset_time(failure_text, result["finished_at_epoch"], policy["usage_recheck"]))
+        result["retry_allowed"] = True
+    elif status == "transient":
+        result.setdefault("next_attempt_at", result["finished_at_epoch"] + min(policy["backoff"] * 2 ** min(failures - 1, 20), 300))
+        result["retry_allowed"] = failures <= policy["transient_retries"]
+    else:
+        result.pop("next_attempt_at", None)
+        result["retry_allowed"] = False
+    save(directory / "attempt.json", result)
+    return result
+
+
+def index_outcome(item, result, number):
+    item.update(status=result["status"], last_attempt=number,
+                transient_failures=result.get("transient_failures", 0),
+                retry_allowed=result.get("retry_allowed", False))
+    item.pop("next_attempt_at", None)
+    if "next_attempt_at" in result:
+        item["next_attempt_at"] = result["next_attempt_at"]
+
+
+def attempt(cli, settings, prompt, directory, timeout, policy=None, transient_failures=0):
     directory.mkdir()
     (directory / "prompt.txt").write_bytes(prompt)
     answer_path = directory / "answer.txt"
     result = {"status": "running", "started_at": stamp(), "prompt_sha256": digest(prompt),
-              "settings": settings, "process_exit_status": None}
+              "settings": settings, "process_exit_status": None,
+              "recovery_policy": policy or {"transient_retries": 3, "backoff": 10, "usage_recheck": 3600},
+              "transient_failures_before": transient_failures}
     command = [cli, "exec", "--ignore-user-config", "--ignore-rules", "--ephemeral",
                "--strict-config", "--skip-git-repo-check", "--json", "--color", "never",
                "--output-last-message", str(answer_path), *overrides(settings), "-"]
@@ -304,30 +395,22 @@ def attempt(cli, settings, prompt, directory, timeout):
                     stop_process(process)
             except OSError as error:
                 err.write(str(error).encode("utf-8"))
-    parsed = audit(directory / "events.jsonl")
-    final_exists = answer_path.exists() and bool(answer_path.read_bytes())
-    # An answer is terminal even after a nonzero exit, timeout, or Ctrl+C.
-    # A partial agent message without turn.completed/-o is incomplete.
-    completed = final_exists or (parsed["turn_completed"] and bool(parsed["answer"]))
-    if not final_exists and parsed["answer"]:
-        target = answer_path if completed else directory / "partial_answer.txt"
-        target.write_text(parsed["answer"], encoding="utf-8", newline="")
-    stderr = (directory / "stderr.txt").read_text(encoding="utf-8", errors="replace")
-    failure = classify(stderr + json.dumps(parsed["errors"]), timed_out)
-    status = ("invalid" if parsed["violations"] else "completed") if completed else (
-        "invalid" if parsed["violations"] else "interrupted" if interrupted else failure)
-    result.update(status=status, ended_at=stamp(), process_exit_status=process.returncode if process else None,
-                  audit=parsed, timed_out=timed_out, interrupted=interrupted)
+    result.update(ended_at=stamp(), finished_at_epoch=time.time(),
+                  process_exit_status=process.returncode if process else None,
+                  timed_out=timed_out, interrupted=interrupted)
+    # Persist process completion before parsing; a kill here can be recovered
+    # from raw streams and the original failure timestamp/policy.
     save(directory / "attempt.json", result)
-    return result
+    return outcome(directory, result, result["recovery_policy"], transient_failures)
 
 
 def recover(root, state):
     """Reconcile disk artifacts after a kill between answer and state update."""
-    changed = False
+    policy = state.get("recovery_policy", {"transient_retries": 3, "backoff": 10, "usage_recheck": 3600})
     for item in state["inputs"]:
         folder = root / item["id"]
-        for directory in sorted(folder.glob("attempt-*")) if folder.exists() else []:
+        failures = 0
+        for directory in sorted(folder.glob("attempt-*"), key=lambda path: int(path.name.split("-")[-1])) if folder.exists() else []:
             meta_path = directory / "attempt.json"
             if not meta_path.exists():
                 continue
@@ -349,19 +432,27 @@ def recover(root, state):
                             alive = False
                     if alive:
                         raise ProtocolError(f"Previous Codex process PID {pid} may still be running. Wait for it to exit before resume.")
-                parsed = audit(directory / "events.jsonl")
-                final = directory / "answer.txt"
-                completed = (final.exists() and bool(final.read_bytes())) or (parsed["turn_completed"] and bool(parsed["answer"]))
-                meta.update(status="invalid" if parsed["violations"] else "completed" if completed else "interrupted",
-                            audit=parsed, ended_at=stamp(), recovered_after_interruption=True)
-                if completed and not final.exists():
-                    final.write_text(parsed["answer"], encoding="utf-8")
-                save(meta_path, meta)
-            if meta["status"] in TERMINAL:
-                item["status"] = meta["status"]
-                changed = True
-    if changed:
-        save(root / "state.json", state)
+                meta["recovered_after_interruption"] = True
+            # Re-audit legacy invalid records too: a truncated final JSON object
+            # was formerly mislabeled as permanent protocol invalidity.
+            if (directory / "events.jsonl").exists():
+                previous_status = meta["status"]
+                meta = outcome(directory, meta, policy, failures)
+                if previous_status == "invalid" and meta["status"] != "invalid":
+                    meta["superseded_status"] = previous_status
+                    save(meta_path, meta)
+            else:
+                # Old records may have no stdout; their saved failure/schedule
+                # is still authoritative and must reach the batch ledger.
+                meta["recovery_policy"] = policy
+                meta.setdefault("transient_failures", failures + (meta["status"] == "transient"))
+                if meta["status"] in {"usage_limit", "transient", "running"}:
+                    meta = outcome(directory, meta, policy, failures)
+            failures = meta.get("transient_failures", failures)
+            index_outcome(item, meta, int(directory.name.split("-")[-1]))
+            if item["status"] in TERMINAL:
+                break
+    save(root / "state.json", state)
 
 
 def run(root, prompts, args):
@@ -389,6 +480,8 @@ def run(root, prompts, args):
                                "sha256": digest(raw), "status": "pending"})
             state = {"created_at": stamp(), "protocol": "initial-pure-reasoning-v1", "inputs": inputs}
             save(root / "state.json", state)
+        state["recovery_policy"] = retry_policy(args)
+        save(root / "state.json", state)
         recover(root, state)
         if all(item["status"] in TERMINAL for item in state["inputs"]):
             print("All inputs already finished; no Codex request made.")
@@ -411,37 +504,31 @@ def run(root, prompts, args):
             if digest(raw) != item["sha256"]:
                 raise ProtocolError("Saved prompt changed; refusing to submit different bytes.")
             prior = list(folder.glob("attempt-*"))
-            remaining = args.retries
+            if item["status"] == "transient" and item.get("transient_failures", 0) > args.retries:
+                raise ProtocolError("Transient retry limit reached. Increase --retries to extend the saved budget.")
             while True:
                 wait_until = item.get("next_attempt_at", 0)
                 while time.time() < wait_until:
-                    time.sleep(min(30, wait_until - time.time()))
+                    time.sleep(max(0, min(30, wait_until - time.time())))
                 number = len(prior) + 1
                 directory = folder / f"attempt-{number:03d}"
                 print(f"{item['id']}: attempt {number}", flush=True)
-                result = attempt(cli, verified["settings"], raw, directory, args.timeout)
+                result = attempt(cli, verified["settings"], raw, directory, args.timeout,
+                                 policy=state["recovery_policy"],
+                                 transient_failures=item.get("transient_failures", 0))
                 prior.append(directory)
-                item.update(status=result["status"], last_attempt=number)
-                item.pop("next_attempt_at", None)
+                index_outcome(item, result, number)
                 save(root / "state.json", state)
                 print(f"{item['id']}: {result['status']}", flush=True)
                 if result["status"] in TERMINAL:
                     break
-                if result["status"] == "interrupted":
+                if result["status"] == "interrupted" or result.get("interrupted"):
                     raise KeyboardInterrupt
                 if result["status"] in {"authentication", "unsupported_configuration", "incomplete"}:
                     raise ProtocolError(f"Stopped: {result['status']}. Inspect {directory / 'stderr.txt'} and attempt.json.")
-                if result["status"] == "usage_limit":
-                    text = (directory / "stderr.txt").read_text(encoding="utf-8", errors="replace") + json.dumps(result["audit"]["errors"])
-                    next_at = reset_time(text, time.time(), args.usage_recheck)
-                else:
-                    next_at = time.time() + min(args.backoff * 2 ** (args.retries - remaining), 300)
-                item["next_attempt_at"] = next_at
-                save(root / "state.json", state)
-                if remaining <= 0:
+                if not result.get("retry_allowed"):
                     raise ProtocolError("Retry limit reached. Progress and next permitted attempt time saved; resume when ready.")
-                remaining -= 1
-                print(f"Waiting until {dt.datetime.fromtimestamp(next_at, dt.timezone.utc).isoformat()} before a fresh attempt.", flush=True)
+                print(f"Waiting until {dt.datetime.fromtimestamp(result['next_attempt_at'], dt.timezone.utc).isoformat()} before a fresh attempt.", flush=True)
 
 
 def main(argv=None):
@@ -453,7 +540,7 @@ def main(argv=None):
         cmd = commands.add_parser(name)
         cmd.add_argument("--run-dir", type=Path, required=True)
         cmd.add_argument("--timeout", type=float, default=1800, help="seconds per attempt")
-        cmd.add_argument("--retries", type=int, default=3, help="additional infrastructure attempts per pending input per invocation")
+        cmd.add_argument("--retries", type=int, default=3, help="additional transient retries per input across restarts; quota waits are unlimited")
         cmd.add_argument("--backoff", type=float, default=10)
         cmd.add_argument("--usage-recheck", type=float, default=3600, help="seconds if reset unknown (default one hour)")
         if name == "run":

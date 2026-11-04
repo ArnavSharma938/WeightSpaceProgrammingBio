@@ -1,6 +1,7 @@
 # Initial pure-reasoning Codex runner implementation report
 
-Implemented for Experiment 1 of the weight-space project on 2026-11-03
+Implemented for Experiment 1 of the weight-space project on 2026-11-03;
+recovery fixes and a real smoke validation completed on 2026-11-04
 (America/New_York; verification timestamps are recorded in UTC).
 
 The runner is generic: it receives separately prepared UTF-8 prompt files and
@@ -18,8 +19,8 @@ standard library. `runner/pure_reasoning.toml` contains execution policy, and
 The installed CLI was inspected directly: `codex-cli 0.164.0`. Its help,
 feature inventory, bundled model catalog, and local prompt-inspection command
 were checked. The catalog contains exactly the requested `gpt-6.1-sol` model
-and supports high reasoning effort. Model access for this authenticated account
-has not been tested through inference; unsupported access will stop a run.
+and supports high reasoning effort. Authentication and model access for this
+account were validated by the harmless live smoke request described below.
 The implementation rejects other CLI versions pending explicit revalidation.
 
 Real requests invoke native `codex.exe exec` with `--ignore-user-config`,
@@ -64,9 +65,14 @@ status, reported usage, timeout/interruption flags, and the event audit. Run-lev
 execution metadata records the CLI version and complete settings. An atomic
 ledger tracks per-input status and next allowed attempt time.
 
-Only agent-message and reasoning items are allowed. Tool items/call metadata,
-unknown item/event types, malformed JSONL, multiple threads/turns, or an unexpected
-reported model invalidate the attempt. Completed and invalid inputs are terminal
+Agent-message, reasoning, and CLI diagnostic error items are allowed. Diagnostic
+messages are retained and inspected for failure classification. Tool items/call
+metadata, unknown item/event types, malformed complete JSONL records, multiple
+threads/turns, or an unexpected reported model invalidate the attempt. A truncated
+final JSONL/UTF-8 fragment is separately recorded as incomplete output and is
+recoverable if no completed answer or confirmed violation exists. A completed
+answer with an incomplete audit remains terminal-invalid to prevent resubmission.
+Completed and invalid inputs are terminal
 and are skipped after restart. A wrong answer, refusal, or uncertainty does not
 trigger a retry. A CLI final-answer file, or an agent message followed by
 `turn.completed`, ends the request even if process cleanup exits nonzero.
@@ -75,7 +81,10 @@ Transient infrastructure failures use exponential backoff, capped at five
 minutes. Usage-limit failures wait for a parseable reported epoch/ISO reset or
 relative delay; otherwise the default conservative interval is one hour. This
 deadline survives restarting the runner and exhausting a retry budget. Timeouts,
-retry count, base backoff, and unknown-reset interval are configurable.
+retry count, base backoff, and unknown-reset interval are configurable. Quota
+waits are unlimited and do not spend the transient retry allowance. Transient
+failures are counted across restarts; increasing `--retries` on resume extends
+that allowance. Expired reset timestamps use the conservative fallback interval.
 Authentication, unsupported configuration, and unexplained incomplete failures
 stop for inspection. Retrying after a manual resume creates a separate attempt.
 
@@ -88,22 +97,78 @@ automatically on process exit. As with local process orchestration generally,
 a forced kill can leave temporary files; normal Ctrl+C is the supported clean
 interruption path.
 
+## Recovery corrections
+
+The user reported two reproducible crash/recovery defects in the original
+implementation. Both are corrected on the actual installed CLI 0.164.0; the
+friend's 0.166.0-alpha.1 environment was not installed or validated here.
+
+1. A process interrupted mid-JSONL record was permanently marked invalid. The
+   parser now distinguishes an unterminated final fragment from confirmed tool
+   events or malformed complete records. Interrupted fragments remain in the
+   original raw stream and are eligible for appropriate recovery. Legacy attempts
+   affected by the old parser are re-audited, retaining their previous audit.
+2. Failed attempts did not carry their scheduling state into the ledger during
+   recovery. A single `outcome()` function now classifies and schedules both live
+   execution and recovery. `attempt.json` is authoritative and stores the finish
+   timestamp, failure status, retry policy, transient count, and next permitted
+   attempt time before `state.json` is updated. Recovery reconstructs all outcomes,
+   not just completed/invalid ones. If a crash occurs before classification, raw
+   errors and the original failure timestamp reconstruct the deadline. An
+   unavailable timestamp causes a conservative later wait, never an early retry.
+
+Quota waiting now uses that same durable state, while remaining independent of
+the bounded transient-error allowance. Repeated quota failures can recover
+unattended without requiring manual resume after three waits.
+
 ## Verification
 
 The offline isolation preflight passed against the actual installed CLI.
-Twenty-four runner tests use mocked Codex processes/local inspection results;
-the existing architecture test also passes (25 tests total). Coverage includes
+Thirty-nine runner tests use mocked Codex processes/local inspection results;
+the existing architecture test also passes (40 tests total). Coverage includes
 UTF-8/BOM/CRLF preservation, sequential files, event parsing and usage, native
 tool and unknown-event detection, terminal answers after nonzero exits, partial
 messages, refusals, timeout/Ctrl+C handling, error classification, retry limits,
 reset waiting and fallback, persisted deadlines, restart skipping, crash
 reconciliation, live-process protection, changed-prompt rejection, unsupported
-CLI rejection, isolation failure rejection, and duplicate-run locking.
+CLI rejection, isolation failure rejection, and duplicate-run locking. Added
+regressions exercise partial JSON/UTF-8 tails, confirmed tool use before a partial
+tail, legacy-invalid migration, quotas saved before a ledger commit, raw quota
+failure recovery, stable reconstruction from original failure time, no submission
+before a recovered reset, unlimited quota waits with `--retries 0`, durable
+transient budgets, diagnostic error items, and preservation of superseded audits.
 
-No actual prompt submission, model access probe, or live retry test was used.
-This intentionally leaves end-to-end server behavior untested until the user
-launches the first prepared prompt. Every real request retains the same event
-audit and fails closed on unsupported configuration or tool use.
+## Live smoke validation
+
+Exactly one real inference request was made through the actual runner. No
+experimental prompt or model weights were submitted. The smoke fixture asks
+only: `Reply with exactly WEIGHT_SPACE_SMOKE_OK.`
+
+| Measurement | Observed value |
+|---|---|
+| CLI | `codex-cli 0.164.0` |
+| Requested model / reasoning | `gpt-6.1-sol` / `high` |
+| Started / finished (UTC) | 2026-11-04 13:53:44.945 / 13:53:48.894 |
+| Final answer | `WEIGHT_SPACE_SMOKE_OK` |
+| Process exit status | 0 |
+| Input / cached input tokens | 2,238 / 2,048 |
+| Output / reported reasoning output tokens | 10 / 0 |
+| Final audit | `tool_free: true`, zero violations, complete JSONL |
+| Requests / attempt directories | 1 / 1 |
+
+This verified existing authentication, access to the requested model, real event
+compatibility, usage parsing, final-answer capture, and the native-tool audit.
+The stream also contains five startup/config diagnostic items of type `error`.
+The initial parser rejected those conservatively as unknown items. After adding
+support for this observed CLI diagnostic type, the same saved response was
+re-audited and marked completed. The initial audit remains in `audit_history`.
+No answer was retried. Running `resume` printed that all inputs were finished
+and made no Codex request.
+
+Evidence is under `runs/pure_reasoning/smoke_20261104`, including the exact prompt,
+execution settings, raw events, answer, stderr, attempt metadata, and batch ledger.
+Quota waiting and crash windows were tested with mocks rather than deliberately
+exhausting live quota or interrupting another paid request.
 
 ## Codebase simplification and reports
 
