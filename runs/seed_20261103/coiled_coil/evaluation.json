@@ -1,0 +1,513 @@
+{
+  "checkpoint": "C:\\Users\\arnav.DHEERAJACER\\protein_weight_space_cnns\\runs\\seed_20261103\\coiled_coil\\checkpoints\\best_state_dict.pt",
+  "checkpoint_sha256": "7445e085784d6a3891fbe640ba2c788c3b679464b292d30968c652aea921db73",
+  "composition_preserving_shuffle_control": {
+    "description": "Each held-out sequence was independently residue-shuffled, preserving its amino-acid composition.",
+    "metrics": {
+      "accuracy": 0.8815426997245179,
+      "balanced_accuracy": 0.8957379477511447,
+      "f1": 0.6666666666666666,
+      "fn": 4,
+      "fp": 39,
+      "mcc": 0.6354334560717422,
+      "mean_negative_score": 0.2047039419412613,
+      "mean_positive_score": 0.8329411149024963,
+      "n": 363,
+      "negatives": 316,
+      "positives": 47,
+      "precision": 0.524390243902439,
+      "recall": 0.9148936170212766,
+      "roc_auc": 0.9482224616213305,
+      "specificity": 0.8765822784810127,
+      "tn": 277,
+      "tp": 43
+    },
+    "positive_fraction_score_decreased": 0.6170212765957447,
+    "positive_mean_original_score": 0.8580338358879089,
+    "positive_mean_shuffled_score": 0.8329411149024963
+  },
+  "credible_heldout_discrimination": true,
+  "heldout_positive_mutation_scan": {
+    "examples": 32,
+    "largest_mean_decreases": [
+      {
+        "mean_score_drop": 0.08192262798547745,
+        "median_score_drop": 0.05564424395561218,
+        "position_1_based": 27
+      },
+      {
+        "mean_score_drop": 0.07986333966255188,
+        "median_score_drop": 0.04396897554397583,
+        "position_1_based": 43
+      },
+      {
+        "mean_score_drop": 0.07931512594223022,
+        "median_score_drop": 0.053024739027023315,
+        "position_1_based": 24
+      },
+      {
+        "mean_score_drop": 0.07694040238857269,
+        "median_score_drop": 0.06020611524581909,
+        "position_1_based": 25
+      },
+      {
+        "mean_score_drop": 0.07547405362129211,
+        "median_score_drop": 0.03837898373603821,
+        "position_1_based": 44
+      },
+      {
+        "mean_score_drop": 0.0754471868276596,
+        "median_score_drop": 0.050008624792099,
+        "position_1_based": 45
+      },
+      {
+        "mean_score_drop": 0.07506512850522995,
+        "median_score_drop": 0.04892528057098389,
+        "position_1_based": 26
+      },
+      {
+        "mean_score_drop": 0.07467411458492279,
+        "median_score_drop": 0.04373237490653992,
+        "position_1_based": 32
+      },
+      {
+        "mean_score_drop": 0.07445541024208069,
+        "median_score_drop": 0.04653453826904297,
+        "position_1_based": 29
+      },
+      {
+        "mean_score_drop": 0.07442814111709595,
+        "median_score_drop": 0.05125191807746887,
+        "position_1_based": 28
+      }
+    ],
+    "largest_mean_increases": [
+      {
+        "mean_score_drop": 0.008929863572120667,
+        "median_score_drop": 0.0045993030071258545,
+        "position_1_based": 70
+      },
+      {
+        "mean_score_drop": 0.015221224166452885,
+        "median_score_drop": 0.005154222249984741,
+        "position_1_based": 13
+      },
+      {
+        "mean_score_drop": 0.01622157171368599,
+        "median_score_drop": 0.010532736778259277,
+        "position_1_based": 14
+      },
+      {
+        "mean_score_drop": 0.01705751195549965,
+        "median_score_drop": 0.010185867547988892,
+        "position_1_based": 69
+      },
+      {
+        "mean_score_drop": 0.01705797202885151,
+        "median_score_drop": 0.009663164615631104,
+        "position_1_based": 10
+      },
+      {
+        "mean_score_drop": 0.017118599265813828,
+        "median_score_drop": 0.01097649335861206,
+        "position_1_based": 68
+      },
+      {
+        "mean_score_drop": 0.01751062087714672,
+        "median_score_drop": 0.008236438035964966,
+        "position_1_based": 11
+      },
+      {
+        "mean_score_drop": 0.01889248564839363,
+        "median_score_drop": 0.007994681596755981,
+        "position_1_based": 12
+      },
+      {
+        "mean_score_drop": 0.02001991868019104,
+        "median_score_drop": 0.007197171449661255,
+        "position_1_based": 16
+      },
+      {
+        "mean_score_drop": 0.021951861679553986,
+        "median_score_drop": 0.012265801429748535,
+        "position_1_based": 59
+      }
+    ],
+    "positions": [
+      {
+        "mean_score_drop": 0.02255968004465103,
+        "median_score_drop": 0.012248903512954712,
+        "position_1_based": 1
+      },
+      {
+        "mean_score_drop": 0.024221839383244514,
+        "median_score_drop": 0.014111548662185669,
+        "position_1_based": 2
+      },
+      {
+        "mean_score_drop": 0.03389628604054451,
+        "median_score_drop": 0.01786363124847412,
+        "position_1_based": 3
+      },
+      {
+        "mean_score_drop": 0.0375109538435936,
+        "median_score_drop": 0.02514895796775818,
+        "position_1_based": 4
+      },
+      {
+        "mean_score_drop": 0.03046366199851036,
+        "median_score_drop": 0.016709744930267334,
+        "position_1_based": 5
+      },
+      {
+        "mean_score_drop": 0.03321680426597595,
+        "median_score_drop": 0.016200095415115356,
+        "position_1_based": 6
+      },
+      {
+        "mean_score_drop": 0.03030053712427616,
+        "median_score_drop": 0.016208738088607788,
+        "position_1_based": 7
+      },
+      {
+        "mean_score_drop": 0.02552385814487934,
+        "median_score_drop": 0.010983794927597046,
+        "position_1_based": 8
+      },
+      {
+        "mean_score_drop": 0.025639820843935013,
+        "median_score_drop": 0.010693401098251343,
+        "position_1_based": 9
+      },
+      {
+        "mean_score_drop": 0.01705797202885151,
+        "median_score_drop": 0.009663164615631104,
+        "position_1_based": 10
+      },
+      {
+        "mean_score_drop": 0.01751062087714672,
+        "median_score_drop": 0.008236438035964966,
+        "position_1_based": 11
+      },
+      {
+        "mean_score_drop": 0.01889248564839363,
+        "median_score_drop": 0.007994681596755981,
+        "position_1_based": 12
+      },
+      {
+        "mean_score_drop": 0.015221224166452885,
+        "median_score_drop": 0.005154222249984741,
+        "position_1_based": 13
+      },
+      {
+        "mean_score_drop": 0.01622157171368599,
+        "median_score_drop": 0.010532736778259277,
+        "position_1_based": 14
+      },
+      {
+        "mean_score_drop": 0.021979648619890213,
+        "median_score_drop": 0.010355204343795776,
+        "position_1_based": 15
+      },
+      {
+        "mean_score_drop": 0.02001991868019104,
+        "median_score_drop": 0.007197171449661255,
+        "position_1_based": 16
+      },
+      {
+        "mean_score_drop": 0.02693287283182144,
+        "median_score_drop": 0.011728882789611816,
+        "position_1_based": 17
+      },
+      {
+        "mean_score_drop": 0.024041615426540375,
+        "median_score_drop": 0.0128517746925354,
+        "position_1_based": 18
+      },
+      {
+        "mean_score_drop": 0.03143319860100746,
+        "median_score_drop": 0.01776084303855896,
+        "position_1_based": 19
+      },
+      {
+        "mean_score_drop": 0.038333699107170105,
+        "median_score_drop": 0.024152368307113647,
+        "position_1_based": 20
+      },
+      {
+        "mean_score_drop": 0.04849720746278763,
+        "median_score_drop": 0.03714427351951599,
+        "position_1_based": 21
+      },
+      {
+        "mean_score_drop": 0.05822950601577759,
+        "median_score_drop": 0.03273609280586243,
+        "position_1_based": 22
+      },
+      {
+        "mean_score_drop": 0.07126035541296005,
+        "median_score_drop": 0.048483073711395264,
+        "position_1_based": 23
+      },
+      {
+        "mean_score_drop": 0.07931512594223022,
+        "median_score_drop": 0.053024739027023315,
+        "position_1_based": 24
+      },
+      {
+        "mean_score_drop": 0.07694040238857269,
+        "median_score_drop": 0.06020611524581909,
+        "position_1_based": 25
+      },
+      {
+        "mean_score_drop": 0.07506512850522995,
+        "median_score_drop": 0.04892528057098389,
+        "position_1_based": 26
+      },
+      {
+        "mean_score_drop": 0.08192262798547745,
+        "median_score_drop": 0.05564424395561218,
+        "position_1_based": 27
+      },
+      {
+        "mean_score_drop": 0.07442814111709595,
+        "median_score_drop": 0.05125191807746887,
+        "position_1_based": 28
+      },
+      {
+        "mean_score_drop": 0.07445541024208069,
+        "median_score_drop": 0.04653453826904297,
+        "position_1_based": 29
+      },
+      {
+        "mean_score_drop": 0.06572051346302032,
+        "median_score_drop": 0.04690781235694885,
+        "position_1_based": 30
+      },
+      {
+        "mean_score_drop": 0.07027316838502884,
+        "median_score_drop": 0.04917362332344055,
+        "position_1_based": 31
+      },
+      {
+        "mean_score_drop": 0.07467411458492279,
+        "median_score_drop": 0.04373237490653992,
+        "position_1_based": 32
+      },
+      {
+        "mean_score_drop": 0.07321824133396149,
+        "median_score_drop": 0.0682661235332489,
+        "position_1_based": 33
+      },
+      {
+        "mean_score_drop": 0.06740408390760422,
+        "median_score_drop": 0.04458180069923401,
+        "position_1_based": 34
+      },
+      {
+        "mean_score_drop": 0.06631767004728317,
+        "median_score_drop": 0.04210159182548523,
+        "position_1_based": 35
+      },
+      {
+        "mean_score_drop": 0.05125555768609047,
+        "median_score_drop": 0.03188154101371765,
+        "position_1_based": 36
+      },
+      {
+        "mean_score_drop": 0.05040985345840454,
+        "median_score_drop": 0.03358994424343109,
+        "position_1_based": 37
+      },
+      {
+        "mean_score_drop": 0.06876561790704727,
+        "median_score_drop": 0.054180413484573364,
+        "position_1_based": 38
+      },
+      {
+        "mean_score_drop": 0.06740333139896393,
+        "median_score_drop": 0.04217544198036194,
+        "position_1_based": 39
+      },
+      {
+        "mean_score_drop": 0.06742529571056366,
+        "median_score_drop": 0.05386891961097717,
+        "position_1_based": 40
+      },
+      {
+        "mean_score_drop": 0.07030314952135086,
+        "median_score_drop": 0.04354104399681091,
+        "position_1_based": 41
+      },
+      {
+        "mean_score_drop": 0.05928368493914604,
+        "median_score_drop": 0.0331098735332489,
+        "position_1_based": 42
+      },
+      {
+        "mean_score_drop": 0.07986333966255188,
+        "median_score_drop": 0.04396897554397583,
+        "position_1_based": 43
+      },
+      {
+        "mean_score_drop": 0.07547405362129211,
+        "median_score_drop": 0.03837898373603821,
+        "position_1_based": 44
+      },
+      {
+        "mean_score_drop": 0.0754471868276596,
+        "median_score_drop": 0.050008624792099,
+        "position_1_based": 45
+      },
+      {
+        "mean_score_drop": 0.06520389020442963,
+        "median_score_drop": 0.0362495481967926,
+        "position_1_based": 46
+      },
+      {
+        "mean_score_drop": 0.05839113891124725,
+        "median_score_drop": 0.031733572483062744,
+        "position_1_based": 47
+      },
+      {
+        "mean_score_drop": 0.05534300208091736,
+        "median_score_drop": 0.030293583869934082,
+        "position_1_based": 48
+      },
+      {
+        "mean_score_drop": 0.05033724755048752,
+        "median_score_drop": 0.03854525089263916,
+        "position_1_based": 49
+      },
+      {
+        "mean_score_drop": 0.05976225063204765,
+        "median_score_drop": 0.03988233208656311,
+        "position_1_based": 50
+      },
+      {
+        "mean_score_drop": 0.05107685923576355,
+        "median_score_drop": 0.03902795910835266,
+        "position_1_based": 51
+      },
+      {
+        "mean_score_drop": 0.04077699035406113,
+        "median_score_drop": 0.020936638116836548,
+        "position_1_based": 52
+      },
+      {
+        "mean_score_drop": 0.042012494057416916,
+        "median_score_drop": 0.024065449833869934,
+        "position_1_based": 53
+      },
+      {
+        "mean_score_drop": 0.031489476561546326,
+        "median_score_drop": 0.020226210355758667,
+        "position_1_based": 54
+      },
+      {
+        "mean_score_drop": 0.02856329455971718,
+        "median_score_drop": 0.017852365970611572,
+        "position_1_based": 55
+      },
+      {
+        "mean_score_drop": 0.026609083637595177,
+        "median_score_drop": 0.014118403196334839,
+        "position_1_based": 56
+      },
+      {
+        "mean_score_drop": 0.023899368941783905,
+        "median_score_drop": 0.011224865913391113,
+        "position_1_based": 57
+      },
+      {
+        "mean_score_drop": 0.022149404510855675,
+        "median_score_drop": 0.012473851442337036,
+        "position_1_based": 58
+      },
+      {
+        "mean_score_drop": 0.021951861679553986,
+        "median_score_drop": 0.012265801429748535,
+        "position_1_based": 59
+      },
+      {
+        "mean_score_drop": 0.022938642650842667,
+        "median_score_drop": 0.015183895826339722,
+        "position_1_based": 60
+      },
+      {
+        "mean_score_drop": 0.026232264935970306,
+        "median_score_drop": 0.01649683713912964,
+        "position_1_based": 61
+      },
+      {
+        "mean_score_drop": 0.027370654046535492,
+        "median_score_drop": 0.016223371028900146,
+        "position_1_based": 62
+      },
+      {
+        "mean_score_drop": 0.028613973408937454,
+        "median_score_drop": 0.016719728708267212,
+        "position_1_based": 63
+      },
+      {
+        "mean_score_drop": 0.029557008296251297,
+        "median_score_drop": 0.015543639659881592,
+        "position_1_based": 64
+      },
+      {
+        "mean_score_drop": 0.030155250802636147,
+        "median_score_drop": 0.021869510412216187,
+        "position_1_based": 65
+      },
+      {
+        "mean_score_drop": 0.029531527310609818,
+        "median_score_drop": 0.017665117979049683,
+        "position_1_based": 66
+      },
+      {
+        "mean_score_drop": 0.02330673113465309,
+        "median_score_drop": 0.01236233115196228,
+        "position_1_based": 67
+      },
+      {
+        "mean_score_drop": 0.017118599265813828,
+        "median_score_drop": 0.01097649335861206,
+        "position_1_based": 68
+      },
+      {
+        "mean_score_drop": 0.01705751195549965,
+        "median_score_drop": 0.010185867547988892,
+        "position_1_based": 69
+      },
+      {
+        "mean_score_drop": 0.008929863572120667,
+        "median_score_drop": 0.0045993030071258545,
+        "position_1_based": 70
+      }
+    ],
+    "selection": "score-quantile-spaced held-out positives",
+    "substitution": "G (or P when residue is G)"
+  },
+  "parameter_count": 16418,
+  "suitable_interpretation_target_under_controls": false,
+  "task": "coiled_coil",
+  "test_metrics": {
+    "accuracy": 0.8622589531680441,
+    "balanced_accuracy": 0.884661998384056,
+    "f1": 0.6323529411764706,
+    "fn": 4,
+    "fp": 46,
+    "mcc": 0.6003872553235754,
+    "mean_negative_score": 0.2217150330543518,
+    "mean_positive_score": 0.8580338358879089,
+    "n": 363,
+    "negatives": 316,
+    "positives": 47,
+    "precision": 0.48314606741573035,
+    "recall": 0.9148936170212766,
+    "roc_auc": 0.9503770535954753,
+    "specificity": 0.8544303797468354,
+    "tn": 270,
+    "tp": 43
+  }
+}

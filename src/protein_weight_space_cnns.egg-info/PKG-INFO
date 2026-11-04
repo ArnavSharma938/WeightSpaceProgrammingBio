@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: protein-weight-space-cnns
+Version: 0.1.0
+Summary: Reproducible training of the three Experiment 1 protein CNNs
+Requires-Python: <3.13,>=3.10
+Requires-Dist: numpy==2.5.4
+Requires-Dist: torch==2.15.0

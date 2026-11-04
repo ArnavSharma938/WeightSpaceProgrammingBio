@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+src/protein_cnns/__init__.py
+src/protein_cnns/config.py
+src/protein_cnns/data.py
+src/protein_cnns/evaluation.py
+src/protein_cnns/io.py
+src/protein_cnns/metrics.py
+src/protein_cnns/model.py
+src/protein_cnns/training.py
+src/protein_weight_space_cnns.egg-info/PKG-INFO
+src/protein_weight_space_cnns.egg-info/SOURCES.txt
+src/protein_weight_space_cnns.egg-info/dependency_links.txt
+src/protein_weight_space_cnns.egg-info/requires.txt
+src/protein_weight_space_cnns.egg-info/top_level.txt
+tests/test_model.py

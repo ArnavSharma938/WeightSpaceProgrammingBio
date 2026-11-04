@@ -1,0 +1,28 @@
+# Initial pure-reasoning weight-space experiments; execution policy, never prompt text.
+model = "gpt-6.1-sol"
+model_provider = "openai"
+model_reasoning_effort = "high"
+approval_policy = "never"
+sandbox_mode = "read-only"
+web_search = "disabled"
+project_doc_max_bytes = 0
+developer_instructions = ""
+include_environment_context = false
+include_environment_context_time = false
+include_permissions_instructions = false
+include_collaboration_mode_instructions = false
+include_apps_instructions = false
+[agents]
+enabled = false
+[skills]
+include_instructions = false
+[skills.bundled]
+enabled = false
+[memories]
+use_memories = false
+generate_memories = false
+dedicated_tools = false
+[tools.update_plan]
+enabled = false
+[tools.experimental_request_user_input]
+enabled = false

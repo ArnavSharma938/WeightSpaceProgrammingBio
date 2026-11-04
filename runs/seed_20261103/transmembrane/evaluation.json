@@ -1,0 +1,513 @@
+{
+  "checkpoint": "C:\\Users\\arnav.DHEERAJACER\\protein_weight_space_cnns\\runs\\seed_20261103\\transmembrane\\checkpoints\\best_state_dict.pt",
+  "checkpoint_sha256": "b8a05efc618d5b0f511b8b508bfd3c09961d5e181db4624e31b0ad77e69c710c",
+  "composition_preserving_shuffle_control": {
+    "description": "Each held-out sequence was independently residue-shuffled, preserving its amino-acid composition.",
+    "metrics": {
+      "accuracy": 0.8974692966133234,
+      "balanced_accuracy": 0.8121068761118754,
+      "f1": 0.7170005136106831,
+      "fn": 339,
+      "fp": 212,
+      "mcc": 0.6568022511601393,
+      "mean_negative_score": 0.06447574496269226,
+      "mean_positive_score": 0.6776036620140076,
+      "n": 5374,
+      "negatives": 4337,
+      "positives": 1037,
+      "precision": 0.7670329670329671,
+      "recall": 0.6730954676952748,
+      "roc_auc": 0.9196075614973667,
+      "specificity": 0.9511182845284759,
+      "tn": 4125,
+      "tp": 698
+    },
+    "positive_fraction_score_decreased": 0.8534233365477338,
+    "positive_mean_original_score": 0.9531427621841431,
+    "positive_mean_shuffled_score": 0.6776036620140076
+  },
+  "credible_heldout_discrimination": true,
+  "heldout_positive_mutation_scan": {
+    "examples": 32,
+    "largest_mean_decreases": [
+      {
+        "mean_score_drop": 0.029446085914969444,
+        "median_score_drop": 1.1920928955078125e-07,
+        "position_1_based": 46
+      },
+      {
+        "mean_score_drop": 0.023133978247642517,
+        "median_score_drop": 1.1920928955078125e-07,
+        "position_1_based": 42
+      },
+      {
+        "mean_score_drop": 0.022225217893719673,
+        "median_score_drop": 7.922644726932049e-06,
+        "position_1_based": 37
+      },
+      {
+        "mean_score_drop": 0.022168317809700966,
+        "median_score_drop": 1.7881393432617188e-07,
+        "position_1_based": 38
+      },
+      {
+        "mean_score_drop": 0.021356048062443733,
+        "median_score_drop": 2.384185791015625e-07,
+        "position_1_based": 44
+      },
+      {
+        "mean_score_drop": 0.0207567997276783,
+        "median_score_drop": 0.0,
+        "position_1_based": 45
+      },
+      {
+        "mean_score_drop": 0.020402921363711357,
+        "median_score_drop": 5.960464477539063e-08,
+        "position_1_based": 49
+      },
+      {
+        "mean_score_drop": 0.018306482583284378,
+        "median_score_drop": 0.0,
+        "position_1_based": 40
+      },
+      {
+        "mean_score_drop": 0.016636371612548828,
+        "median_score_drop": 1.1920928955078125e-07,
+        "position_1_based": 47
+      },
+      {
+        "mean_score_drop": 0.015385270118713379,
+        "median_score_drop": 5.960464477539063e-08,
+        "position_1_based": 36
+      }
+    ],
+    "largest_mean_increases": [
+      {
+        "mean_score_drop": -0.009548284113407135,
+        "median_score_drop": 6.556510925292969e-07,
+        "position_1_based": 27
+      },
+      {
+        "mean_score_drop": -0.008851504884660244,
+        "median_score_drop": 0.0,
+        "position_1_based": 21
+      },
+      {
+        "mean_score_drop": -0.00663765799254179,
+        "median_score_drop": 0.0,
+        "position_1_based": 34
+      },
+      {
+        "mean_score_drop": -0.006110017187893391,
+        "median_score_drop": 0.0,
+        "position_1_based": 65
+      },
+      {
+        "mean_score_drop": -0.0044272420927882195,
+        "median_score_drop": 0.0,
+        "position_1_based": 11
+      },
+      {
+        "mean_score_drop": -0.004035047255456448,
+        "median_score_drop": 5.960464477539063e-08,
+        "position_1_based": 30
+      },
+      {
+        "mean_score_drop": -0.003517875447869301,
+        "median_score_drop": 0.0,
+        "position_1_based": 54
+      },
+      {
+        "mean_score_drop": -0.002920808969065547,
+        "median_score_drop": 2.384185791015625e-07,
+        "position_1_based": 17
+      },
+      {
+        "mean_score_drop": -0.0025801456067711115,
+        "median_score_drop": 0.0,
+        "position_1_based": 14
+      },
+      {
+        "mean_score_drop": -0.002231727819889784,
+        "median_score_drop": 2.980232238769531e-07,
+        "position_1_based": 23
+      }
+    ],
+    "positions": [
+      {
+        "mean_score_drop": -0.00046645820839330554,
+        "median_score_drop": -1.0132789611816406e-06,
+        "position_1_based": 1
+      },
+      {
+        "mean_score_drop": -0.0004990706802345812,
+        "median_score_drop": 0.0,
+        "position_1_based": 2
+      },
+      {
+        "mean_score_drop": 0.0006953009287826717,
+        "median_score_drop": 0.0,
+        "position_1_based": 3
+      },
+      {
+        "mean_score_drop": -0.000267813476966694,
+        "median_score_drop": 0.0,
+        "position_1_based": 4
+      },
+      {
+        "mean_score_drop": 0.0005405750125646591,
+        "median_score_drop": 0.0,
+        "position_1_based": 5
+      },
+      {
+        "mean_score_drop": 0.0008973632357083261,
+        "median_score_drop": 0.0,
+        "position_1_based": 6
+      },
+      {
+        "mean_score_drop": -0.0001614162465557456,
+        "median_score_drop": 2.384185791015625e-07,
+        "position_1_based": 7
+      },
+      {
+        "mean_score_drop": 0.0011997234541922808,
+        "median_score_drop": 0.0,
+        "position_1_based": 8
+      },
+      {
+        "mean_score_drop": -0.00021573191042989492,
+        "median_score_drop": 0.0,
+        "position_1_based": 9
+      },
+      {
+        "mean_score_drop": 0.0007717232801951468,
+        "median_score_drop": 0.0,
+        "position_1_based": 10
+      },
+      {
+        "mean_score_drop": -0.0044272420927882195,
+        "median_score_drop": 0.0,
+        "position_1_based": 11
+      },
+      {
+        "mean_score_drop": 0.0011018714867532253,
+        "median_score_drop": 0.0,
+        "position_1_based": 12
+      },
+      {
+        "mean_score_drop": -0.0003326070436742157,
+        "median_score_drop": 0.0,
+        "position_1_based": 13
+      },
+      {
+        "mean_score_drop": -0.0025801456067711115,
+        "median_score_drop": 0.0,
+        "position_1_based": 14
+      },
+      {
+        "mean_score_drop": -0.001971460646018386,
+        "median_score_drop": 0.0,
+        "position_1_based": 15
+      },
+      {
+        "mean_score_drop": -0.0011032624170184135,
+        "median_score_drop": 0.0,
+        "position_1_based": 16
+      },
+      {
+        "mean_score_drop": -0.002920808969065547,
+        "median_score_drop": 2.384185791015625e-07,
+        "position_1_based": 17
+      },
+      {
+        "mean_score_drop": 0.0031010345555841923,
+        "median_score_drop": 1.0728836059570312e-06,
+        "position_1_based": 18
+      },
+      {
+        "mean_score_drop": 0.004608238581568003,
+        "median_score_drop": 2.086162567138672e-06,
+        "position_1_based": 19
+      },
+      {
+        "mean_score_drop": 0.0023063672706484795,
+        "median_score_drop": 2.980232238769531e-07,
+        "position_1_based": 20
+      },
+      {
+        "mean_score_drop": -0.008851504884660244,
+        "median_score_drop": 0.0,
+        "position_1_based": 21
+      },
+      {
+        "mean_score_drop": 0.0006825351156294346,
+        "median_score_drop": -3.5762786865234375e-07,
+        "position_1_based": 22
+      },
+      {
+        "mean_score_drop": -0.002231727819889784,
+        "median_score_drop": 2.980232238769531e-07,
+        "position_1_based": 23
+      },
+      {
+        "mean_score_drop": 0.008836952969431877,
+        "median_score_drop": 7.152557373046875e-06,
+        "position_1_based": 24
+      },
+      {
+        "mean_score_drop": 0.007287216372787952,
+        "median_score_drop": 1.7285346984863281e-06,
+        "position_1_based": 25
+      },
+      {
+        "mean_score_drop": 0.007190030068159103,
+        "median_score_drop": 1.0163348633795977e-05,
+        "position_1_based": 26
+      },
+      {
+        "mean_score_drop": -0.009548284113407135,
+        "median_score_drop": 6.556510925292969e-07,
+        "position_1_based": 27
+      },
+      {
+        "mean_score_drop": 0.0043985010124742985,
+        "median_score_drop": 1.9073486328125e-06,
+        "position_1_based": 28
+      },
+      {
+        "mean_score_drop": 0.002728209597989917,
+        "median_score_drop": 8.940696716308594e-07,
+        "position_1_based": 29
+      },
+      {
+        "mean_score_drop": -0.004035047255456448,
+        "median_score_drop": 5.960464477539063e-08,
+        "position_1_based": 30
+      },
+      {
+        "mean_score_drop": 0.005278636235743761,
+        "median_score_drop": 2.384185791015625e-07,
+        "position_1_based": 31
+      },
+      {
+        "mean_score_drop": 0.01165514811873436,
+        "median_score_drop": 1.7881393432617188e-07,
+        "position_1_based": 32
+      },
+      {
+        "mean_score_drop": 0.011932166293263435,
+        "median_score_drop": 8.344650268554688e-07,
+        "position_1_based": 33
+      },
+      {
+        "mean_score_drop": -0.00663765799254179,
+        "median_score_drop": 0.0,
+        "position_1_based": 34
+      },
+      {
+        "mean_score_drop": 0.013096555136144161,
+        "median_score_drop": 2.384185791015625e-07,
+        "position_1_based": 35
+      },
+      {
+        "mean_score_drop": 0.015385270118713379,
+        "median_score_drop": 5.960464477539063e-08,
+        "position_1_based": 36
+      },
+      {
+        "mean_score_drop": 0.022225217893719673,
+        "median_score_drop": 7.922644726932049e-06,
+        "position_1_based": 37
+      },
+      {
+        "mean_score_drop": 0.022168317809700966,
+        "median_score_drop": 1.7881393432617188e-07,
+        "position_1_based": 38
+      },
+      {
+        "mean_score_drop": 0.002912051510065794,
+        "median_score_drop": 0.0,
+        "position_1_based": 39
+      },
+      {
+        "mean_score_drop": 0.018306482583284378,
+        "median_score_drop": 0.0,
+        "position_1_based": 40
+      },
+      {
+        "mean_score_drop": 0.006737887859344482,
+        "median_score_drop": 0.0,
+        "position_1_based": 41
+      },
+      {
+        "mean_score_drop": 0.023133978247642517,
+        "median_score_drop": 1.1920928955078125e-07,
+        "position_1_based": 42
+      },
+      {
+        "mean_score_drop": 0.010571470484137535,
+        "median_score_drop": 0.0,
+        "position_1_based": 43
+      },
+      {
+        "mean_score_drop": 0.021356048062443733,
+        "median_score_drop": 2.384185791015625e-07,
+        "position_1_based": 44
+      },
+      {
+        "mean_score_drop": 0.0207567997276783,
+        "median_score_drop": 0.0,
+        "position_1_based": 45
+      },
+      {
+        "mean_score_drop": 0.029446085914969444,
+        "median_score_drop": 1.1920928955078125e-07,
+        "position_1_based": 46
+      },
+      {
+        "mean_score_drop": 0.016636371612548828,
+        "median_score_drop": 1.1920928955078125e-07,
+        "position_1_based": 47
+      },
+      {
+        "mean_score_drop": 0.006840003654360771,
+        "median_score_drop": 0.0,
+        "position_1_based": 48
+      },
+      {
+        "mean_score_drop": 0.020402921363711357,
+        "median_score_drop": 5.960464477539063e-08,
+        "position_1_based": 49
+      },
+      {
+        "mean_score_drop": 0.007225686684250832,
+        "median_score_drop": 0.0,
+        "position_1_based": 50
+      },
+      {
+        "mean_score_drop": -0.0014611892402172089,
+        "median_score_drop": -5.960464477539063e-08,
+        "position_1_based": 51
+      },
+      {
+        "mean_score_drop": 7.579568773508072e-05,
+        "median_score_drop": 1.6689300537109375e-06,
+        "position_1_based": 52
+      },
+      {
+        "mean_score_drop": 0.007003325503319502,
+        "median_score_drop": 0.0,
+        "position_1_based": 53
+      },
+      {
+        "mean_score_drop": -0.003517875447869301,
+        "median_score_drop": 0.0,
+        "position_1_based": 54
+      },
+      {
+        "mean_score_drop": -0.0005014983471482992,
+        "median_score_drop": -5.960464477539063e-08,
+        "position_1_based": 55
+      },
+      {
+        "mean_score_drop": -0.001325748162344098,
+        "median_score_drop": 0.0,
+        "position_1_based": 56
+      },
+      {
+        "mean_score_drop": -0.0019608400762081146,
+        "median_score_drop": -5.960464477539063e-08,
+        "position_1_based": 57
+      },
+      {
+        "mean_score_drop": -0.0018177106976509094,
+        "median_score_drop": 0.0,
+        "position_1_based": 58
+      },
+      {
+        "mean_score_drop": 0.0026935413479804993,
+        "median_score_drop": 0.0,
+        "position_1_based": 59
+      },
+      {
+        "mean_score_drop": 0.0016321102157235146,
+        "median_score_drop": 0.0,
+        "position_1_based": 60
+      },
+      {
+        "mean_score_drop": -0.0017945216968655586,
+        "median_score_drop": -1.1920928955078125e-07,
+        "position_1_based": 61
+      },
+      {
+        "mean_score_drop": 0.0026503121480345726,
+        "median_score_drop": 0.0,
+        "position_1_based": 62
+      },
+      {
+        "mean_score_drop": 0.0027465755119919777,
+        "median_score_drop": -1.1920928955078125e-07,
+        "position_1_based": 63
+      },
+      {
+        "mean_score_drop": -0.0005765914684161544,
+        "median_score_drop": 0.0,
+        "position_1_based": 64
+      },
+      {
+        "mean_score_drop": -0.006110017187893391,
+        "median_score_drop": 0.0,
+        "position_1_based": 65
+      },
+      {
+        "mean_score_drop": -0.0002970908535644412,
+        "median_score_drop": 0.0,
+        "position_1_based": 66
+      },
+      {
+        "mean_score_drop": -0.0016271690838038921,
+        "median_score_drop": -5.960464477539063e-08,
+        "position_1_based": 67
+      },
+      {
+        "mean_score_drop": -0.0015968206571415067,
+        "median_score_drop": 0.0,
+        "position_1_based": 68
+      },
+      {
+        "mean_score_drop": -0.0006976136937737465,
+        "median_score_drop": 0.0,
+        "position_1_based": 69
+      },
+      {
+        "mean_score_drop": 0.0020131519995629787,
+        "median_score_drop": 0.0,
+        "position_1_based": 70
+      }
+    ],
+    "selection": "score-quantile-spaced held-out positives",
+    "substitution": "G (or P when residue is G)"
+  },
+  "parameter_count": 16418,
+  "suitable_interpretation_target_under_controls": true,
+  "task": "transmembrane",
+  "test_metrics": {
+    "accuracy": 0.9782285076293263,
+    "balanced_accuracy": 0.9725702389499516,
+    "f1": 0.9446808510638298,
+    "fn": 38,
+    "fp": 79,
+    "mcc": 0.9314057951548623,
+    "mean_negative_score": 0.028713105246424675,
+    "mean_positive_score": 0.9531427621841431,
+    "n": 5374,
+    "negatives": 4337,
+    "positives": 1037,
+    "precision": 0.9267161410018553,
+    "recall": 0.9633558341369335,
+    "roc_auc": 0.9955924098643036,
+    "specificity": 0.9817846437629698,
+    "tn": 4258,
+    "tp": 999
+  }
+}
