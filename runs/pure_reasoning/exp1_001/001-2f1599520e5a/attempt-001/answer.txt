@@ -1,0 +1,22 @@
+**Observations:**
+- **Several first-layer filters favor hydrophobic, relatively uncharged stretches.** Filter 5 gives leucine positive weights at every kernel position: `W1[5,9,:] = [0.007, 0.084, 0.048, 0.082, 0.087, 0.078, 0.085]`. Conversely, its aspartate weights are entirely negative, including `W1[5,2,6] = −0.135`; lysine is also consistently negative, including `W1[5,8,0] = −0.131`. Filter 10 similarly favors phenylalanine (`W1[10,4,3] = 0.112`) over lysine (`W1[10,8,5] = −0.181`).
+- **Other filters capture contrasting composition.** Filter 12 favors aspartate at consecutive offsets: `W1[12,2,2:6] = [0.125, 0.123, 0.133, 0.142]`. Filter 13 favors basic residues at some offsets, for example lysine `W1[13,8,0] = 0.127` and arginine `W1[13,14,4] = 0.117`. These suggest distributed physicochemical features rather than one obvious conserved motif.
+- **The second layer reinforces these contrasts.** `W2[1,5,:]` is entirely positive, while `W2[1,10,5] = 0.109` and `W2[1,11,6] = 0.110` connect additional hydrophobic-preferring filters. Connections from contrasting filters include `W2[1,12,4] = −0.108`. Each second-layer activation has a maximum receptive field of 13 residues.
+- **Output evidence depends on position.** For second-layer channel 1, position 19 corresponds to flattened index 89: `W3[1,89] = 0.075`, versus `W3[0,89] = −0.067`. Position 67 likewise favors class 1: `W3[1,137] = 0.084`, versus `W3[0,137] = −0.082`. But at position 0, `W3[1,70] = −0.007` and `W3[0,70] = −0.026`. Thus this hydrophobicity-related pathway is not weighted uniformly.
+- **Biases set activation thresholds, not biological identities.** Examples include `b1[8] = 0.106`, `b1[16] = −0.072`, and `b2[8] = −0.061`. Output biases are small: `b3 = [−0.007, 0.006]`. Input-padding weights, such as `W1[0,20,1] = 0.071`, contribute nothing on the stated canonical inputs.
+
+**Reasoning:**  
+The strongest interpretable pattern is discrimination involving hydrophobic stretches and their surrounding composition. This is compatible with **transmembrane-segment detection**, membrane-versus-soluble protein classification, and **signal-peptide prediction**. Those tasks share hydrophobic sequence features.
+
+The parameters do not establish which interpretation is correct. In particular, position 0 is not stated to be the protein’s actual N terminus, so an N-terminal secretion signal cannot be assumed. Hydrophobic-pathway output weights also remain substantial near the segment’s other end; they do not uniquely reveal a signal-peptide cleavage boundary.
+
+A specific enzyme function, binding specificity, or modification-site task has no comparably clear support here. Nevertheless, correlated training data could make these same features useful for other labels, so such alternatives cannot be strictly excluded. Filter preferences are also not independent residue effects once subsequent layers and ReLUs intervene.
+
+**Task:**  
+**Not uniquely identifiable.** The leading biological interpretation is membrane/transmembrane-related classification driven by position-dependent hydrophobicity; the evidence does not justify naming a more specific established task.
+
+**Description:**  
+The network appears to distinguish sequences containing membrane-like hydrophobic stretches from more polar or charged sequences, with their locations affecting the decision. Whether the training labels represented transmembrane segments, signal peptides, or another correlated property is unknown.
+
+**Confidence:**  
+60% in the broad membrane-related interpretation; substantially lower for any exact task identification.

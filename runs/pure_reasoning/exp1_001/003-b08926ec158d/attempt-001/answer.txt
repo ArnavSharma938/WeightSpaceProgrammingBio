@@ -1,0 +1,20 @@
+**Observations:**
+- Several first-layer filters favor helix-compatible composition and oppose helix breakers. For example, `W1[3,12,:]` (proline) is negative throughout: `[-0.046, -0.012, -0.079, -0.099, -0.120, -0.130, -0.086]`. In that same filter, arginine weights `W1[3,14,:]` are all positive, and glutamine includes `W1[3,13,0]=0.112` and `W1[3,13,6]=0.105`.
+- This is not simply a generic hydrophobicity detector. Filter 16 favors leucine and glutamine at several offsets—`W1[16,9,3]=0.102`, `W1[16,13,1]=0.116`, `W1[16,13,5]=0.115`—while disfavoring phenylalanine: `W1[16,4,3]=-0.092`, `W1[16,4,5]=-0.110`.
+- Other filters capture contrasting composition. Filter 9 has positive proline weights throughout, including `W1[9,12,4]=0.126`; filter 13 has positive glycine weights throughout, including `W1[13,5,2]=0.119`.
+- The second layer combines these contrasting features. For example, `W2[0,13,:]` is entirely positive, whereas connections from helix-favoring filter 16 include `W2[0,16,2]=-0.082` and `W2[0,16,5]=-0.071`. Two seven-residue convolutions give each second-layer activation a 13-residue receptive field.
+- Output weights retain positional information and show a broad central preference, at least in channel 0. At position 22, `W3[0,22]=0.049` versus `W3[1,22]=-0.044`; at position 37, the corresponding values are `0.061` and `-0.066`. At position 0 they are `-0.016` and `0.019`. These features therefore have position-dependent, opposing class effects.
+- Biases adjust activation thresholds: examples are `b1[8]=0.100`, `b1[16]=-0.064`, and `b2[31]=0.063`. The output biases, `b3[0]=-0.010` and `b3[1]=0.008`, are small and do not reveal biological labels. Channel-20 weights cannot explain training discrimination because that input channel is always zero.
+
+**Reasoning:**
+The combination of leucine/glutamine and charged-residue preferences, proline/glycine avoidance in several filters, and unfavorable aromatic weights is characteristic of **coiled-coil-compatible sequence composition**. Seven-residue kernels are also compatible with detecting the coiled-coil heptad repeat, although kernel length alone does not demonstrate that such periodicity was learned.
+
+Ordinary α-helical-region classification is another plausible explanation. Disorder-related or protein-family classification could also exploit overlapping compositional differences. Consequently, the parameters do not uniquely establish the training labels.
+
+A simple transmembrane-helix or signal-peptide detector is less consistent with these observations: those tasks usually emphasize broad hydrophobic enrichment rather than this leucine/glutamine/charged-residue combination. However, isolated filter weights cannot strictly exclude those tasks. Nothing supplied establishes that the segment begins at the protein’s actual N terminus.
+
+**Task:** Most plausible hypothesis: **coiled-coil region prediction—coiled-coil versus non-coiled-coil sequence segments**. This is an inference, not a uniquely recoverable task identity.
+
+**Description:** The network likely distinguishes segments compatible with coiled-coil α-helical assemblies from other protein segments. The biological assignment of output classes 0 and 1 is not established.
+
+**Confidence:** 65% in the coiled-coil hypothesis.

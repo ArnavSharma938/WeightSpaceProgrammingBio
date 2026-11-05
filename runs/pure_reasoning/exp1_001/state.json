@@ -1,0 +1,38 @@
+{
+  "created_at": "2026-11-05T00:36:00.233916+00:00",
+  "protocol": "initial-pure-reasoning-v1",
+  "inputs": [
+    {
+      "id": "001-2f1599520e5a",
+      "source": "C:\\Users\\arnav.DHEERAJACER\\protein_weight_space_cnns\\prompts\\exp1\\model_001.txt",
+      "sha256": "2f1599520e5a471b1ce93ce86a73ed92fe143f50b6fe2dd6a24fda369c0dcda0",
+      "status": "completed",
+      "last_attempt": 1,
+      "transient_failures": 0,
+      "retry_allowed": false
+    },
+    {
+      "id": "002-b254574c4836",
+      "source": "C:\\Users\\arnav.DHEERAJACER\\protein_weight_space_cnns\\prompts\\exp1\\model_002.txt",
+      "sha256": "b254574c48361a5a7e414cccdfb6e67fb9c7855cd948b4cc440da05b4f1389cf",
+      "status": "completed",
+      "last_attempt": 1,
+      "transient_failures": 0,
+      "retry_allowed": false
+    },
+    {
+      "id": "003-b08926ec158d",
+      "source": "C:\\Users\\arnav.DHEERAJACER\\protein_weight_space_cnns\\prompts\\exp1\\model_003.txt",
+      "sha256": "b08926ec158da9aa7fdc22ce9838d72b69dd78bf4bd487ab602d60ec9cf704f3",
+      "status": "completed",
+      "last_attempt": 1,
+      "transient_failures": 0,
+      "retry_allowed": false
+    }
+  ],
+  "recovery_policy": {
+    "transient_retries": 3,
+    "backoff": 10,
+    "usage_recheck": 3600
+  }
+}
