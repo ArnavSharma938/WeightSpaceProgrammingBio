@@ -70,20 +70,14 @@ Both hidden arrays have 32 channels and 70 positions. Flattening is channel-majo
 
 There are 16,418 parameters in total. The network was trained with supervised cross-entropy loss to distinguish two classes of protein sequences.
 
-QUESTION
-The numerical parameters below come from a trained protein-sequence classifier. Identify the classification task it learned by examining those parameters. No computational assistance is available: do not execute code, use a calculator, or run the network. Give your answer in a single response.
+QUESTION. The weights below belong to one neural network that was trained with supervised learning to classify protein sequences. Which classification task was it trained on? Work from the weights. You have no tools: no code execution, no calculator, nothing to run. This is a single response.
 
-Provide the following fields in order:
-
-Observations: Describe structure in the amino-acid channel weights, convolutional filters, position-dependent output weights, and biases. Cite specific tensor indices and numerical values supporting your observations.
-
-Reasoning: Explain which protein classification tasks are consistent with those observations, which alternatives are inconsistent, and why.
-
-Task: Identify the learned classification task as specifically as the evidence allows, using its established name where applicable.
-
-Description: Explain what the network distinguishes in one or two sentences.
-
-Confidence: State your confidence as a percentage from 0 to 100.
+Answer in this order:
+Observations: <what you see in the weights: for each amino-acid input channel, where its weights are large or show structure and what that suggests; what the convolutional filters, output layer and its biases show about the classes; quote the weights you rely on>
+Reasoning: <which kinds of classification task fit these observations, which are ruled out, and why>
+Task: <the classification task, as specifically as you can; if it resembles a well-known task, give that task's name>
+Description: <what the network distinguishes, in one or two sentences>
+Confidence: <0-100>%
 
 THE NETWORK'S WEIGHTS
 All parameter values below are rounded to three decimal places. Indices are zero-based.
@@ -254,18 +248,47 @@ def exclusive_write(path, data):
         os.fsync(handle.fileno())
 
 
-def prepare(out):
+def choose_mapping(records, reuse_mapping=None):
+    if reuse_mapping is None:
+        seed = secrets.randbits(256)
+        return f"{seed:064x}", random.Random(seed).sample(range(3), 3), {}
+    path = Path(reuse_mapping).resolve()
+    raw = path.read_bytes()
+    source = json.loads(raw.decode("utf-8"))
+    require(source.get("private_do_not_submit") is True, "Mapping must be a private exporter manifest")
+    models = source["models"]
+    by_id = {entry["id"]: entry for entry in models}
+    require(len(models) == 3 and set(by_id) == {f"model_{i:03d}" for i in range(1, 4)},
+            "Mapping must contain each anonymous ID exactly once")
+    by_checkpoint = {record["checkpoint"]: index for index, record in enumerate(records)}
+    permutation = []
+    for index in range(1, 4):
+        entry = by_id[f"model_{index:03d}"]
+        require(entry["checkpoint"] in by_checkpoint, "Mapping references an unexpected checkpoint")
+        checkpoint_index = by_checkpoint[entry["checkpoint"]]
+        record = records[checkpoint_index]
+        require(entry["checkpoint_sha256"] == record["checkpoint_sha256"] and entry["task"] == record["task"],
+                "Mapping checkpoint hash/identity does not match current best checkpoint")
+        require(entry["prompt_file"] == f"model_{index:03d}.txt", "Mapping filename does not match its ID")
+        permutation.append(checkpoint_index)
+    require(sorted(permutation) == [0, 1, 2] and source["permutation"] == permutation,
+            "Mapping must assign the three checkpoints once and agree with its saved permutation")
+    return source["permutation_seed_hex"], permutation, {
+        "mapping_reused_from": str(path), "mapping_source_sha256": sha(raw),
+    }
+
+
+def prepare(out, reuse_mapping=None):
     out = Path(out).resolve()
     private = out.parent / "private" / f"{out.name}_manifest.json"
     if out.exists() or private.exists():
         raise FileExistsError(f"Refusing to overwrite prepared output or private manifest: {out}; {private}")
     records = load_checkpoints()
-    seed = secrets.randbits(256)
-    permutation = random.Random(seed).sample(range(3), 3)
+    seed_hex, permutation, mapping_provenance = choose_mapping(records, reuse_mapping)
     manifest = {
         "private_do_not_submit": True,
         "created_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-        "permutation_seed_hex": f"{seed:064x}",
+        "permutation_seed_hex": seed_hex,
         "permutation": permutation,
         "rounding": "Python float .3f formatting; nearest, ties-to-even; negative zero retained",
         "template_sha256": sha(PROMPT.encode("utf-8")),
@@ -274,6 +297,7 @@ def prepare(out):
                                      for name in ("model.py", "common.py", "training.py", "data.py")},
         "torch_version": torch.__version__,
         "models": [],
+        **mapping_provenance,
     }
     prepared = []
     for index, checkpoint_index in enumerate(permutation, 1):
@@ -309,9 +333,11 @@ def prepare(out):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--reuse-mapping", type=Path,
+                        help="Reuse anonymous IDs from an existing private manifest without reshuffling")
     args = parser.parse_args(argv)
     try:
-        prepare(args.out)
+        prepare(args.out, reuse_mapping=args.reuse_mapping)
     except (OSError, ValueError, KeyError, RuntimeError) as error:
         print(f"Export stopped: {error}", file=sys.stderr)
         return 2

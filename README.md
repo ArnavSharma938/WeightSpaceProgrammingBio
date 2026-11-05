@@ -24,6 +24,17 @@ are saved separately in `prompts/private/exp1_manifest.json`. Keep that manifest
 private and never submit it as an experimental message. Existing output or a
 private manifest causes the exporter to stop rather than overwrite either.
 
+To prepare the corrected original-style question while preserving the original
+anonymous checkpoint identities:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\prepare_reasoning_inputs.py --out prompts/exp1_original_style --reuse-mapping prompts/private/exp1_manifest.json
+```
+
+The corrected prompts have their own private manifest at
+`prompts/private/exp1_original_style_manifest.json`; original inputs and runs
+remain separate.
+
 Exporter tests (no network, inference, or Codex):
 
 ```powershell

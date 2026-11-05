@@ -17,6 +17,18 @@ import prepare_reasoning_inputs as exporter
 
 
 class ExportTest(unittest.TestCase):
+    def test_exact_original_style_question_and_answer_block(self):
+        expected = """QUESTION. The weights below belong to one neural network that was trained with supervised learning to classify protein sequences. Which classification task was it trained on? Work from the weights. You have no tools: no code execution, no calculator, nothing to run. This is a single response.
+
+Answer in this order:
+Observations: <what you see in the weights: for each amino-acid input channel, where its weights are large or show structure and what that suggests; what the convolutional filters, output layer and its biases show about the classes; quote the weights you rely on>
+Reasoning: <which kinds of classification task fit these observations, which are ruled out, and why>
+Task: <the classification task, as specifically as you can; if it resembles a well-known task, give that task's name>
+Description: <what the network distinguishes, in one or two sentences>
+Confidence: <0-100>%"""
+        actual = "QUESTION." + exporter.PROMPT.split("QUESTION.", 1)[1].split("\n\nTHE NETWORK'S WEIGHTS", 1)[0]
+        self.assertEqual(actual, expected)
+
     @classmethod
     def setUpClass(cls):
         cls.model = exporter.verify_repository()
@@ -146,6 +158,50 @@ class ExportTest(unittest.TestCase):
         exporter.verify_export(exporter.render(self.state), self.state)
         for name, value in self.state.items():
             self.assertTrue(torch.equal(value, original[name]))
+
+    def test_reuses_mapping_without_randomness_and_preserves_source_manifest(self):
+        original = self.prepare()
+        mapping = self.root / "private/exp1_manifest.json"
+        before = mapping.read_bytes()
+        with patch.object(exporter, "load_checkpoints", return_value=self.records()), patch.object(exporter.secrets, "randbits", side_effect=AssertionError("Do not reshuffle")), contextlib.redirect_stdout(io.StringIO()):
+            corrected = exporter.prepare(self.root / "exp1_original_style", reuse_mapping=mapping)
+        self.assertEqual(mapping.read_bytes(), before)
+        self.assertEqual(corrected["permutation"], original["permutation"])
+        self.assertEqual(corrected["permutation_seed_hex"], original["permutation_seed_hex"])
+        self.assertEqual(corrected["mapping_source_sha256"], exporter.sha(before))
+        for old, new in zip(original["models"], corrected["models"]):
+            for key in ("id", "task", "checkpoint", "checkpoint_sha256", "prompt_file"):
+                self.assertEqual(old[key], new[key])
+        self.assertTrue((self.root / "private/exp1_original_style_manifest.json").is_file())
+
+    def test_reused_mapping_rejects_checkpoint_hash_mismatch_or_duplicate_ids(self):
+        self.prepare()
+        original = json.loads((self.root / "private/exp1_manifest.json").read_text())
+        for change in ("hash", "id"):
+            source = json.loads(json.dumps(original))
+            if change == "hash":
+                source["models"][0]["checkpoint_sha256"] = "bad-hash"
+            else:
+                source["models"][1]["id"] = source["models"][0]["id"]
+            path = self.root / f"bad_{change}.json"
+            path.write_text(json.dumps(source))
+            with self.assertRaises(ValueError):
+                exporter.choose_mapping(self.records(), path)
+
+    def test_only_instruction_block_changes_from_original_prepared_inputs(self):
+        manifest = json.loads((exporter.ROOT / "prompts/private/exp1_manifest.json").read_text(encoding="utf-8"))
+        records = {record["checkpoint"]: record for record in exporter.load_checkpoints()}
+        for entry in manifest["models"]:
+            old_raw = (exporter.ROOT / "prompts/exp1" / entry["prompt_file"]).read_bytes()
+            self.assertEqual(exporter.sha(old_raw), entry["prompt_sha256"])
+            state = records[entry["checkpoint"]]["state"]
+            corrected = exporter.render(state)
+            old_prefix, old_tail = old_raw.decode("utf-8").split("QUESTION\n", 1)
+            new_prefix, new_tail = corrected.split("QUESTION.", 1)
+            self.assertEqual(old_prefix, new_prefix)
+            self.assertEqual(old_tail.split("THE NETWORK'S WEIGHTS", 1)[1],
+                             new_tail.split("THE NETWORK'S WEIGHTS", 1)[1])
+            self.assertEqual(sum(exporter.verify_export(corrected, state).values()), 16418)
 
 
 if __name__ == "__main__":

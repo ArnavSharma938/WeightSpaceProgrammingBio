@@ -1,0 +1,77 @@
+## Observations
+
+The clearest structure is **hydrophobic versus charged/polar sequence recognition**, rather than an obvious, sharply specified amino-acid motif. Individual first-layer weights are not direct class effects; their interpretation must follow the later layers.
+
+In the table, \(W1[o,a,k]\) denotes output filter, amino-acid channel, and kernel position. These are representative entries, not calculated extrema.
+
+| Input channel | Weight evidence and interpretation |
+|---|---|
+| **A** | Mixed, relatively modest preferences: \(W1[5,A,4]=0.098\), but \(W1[15,A,2]=-0.097\). Not a dominant alanine-specific signal. |
+| **C** | Strong, broad positive structure in filter 30: **[0.056, 0.061, 0.087, 0.126, 0.084, 0.100, 0.089]**. Compatible with hydrophobic-region recognition; not evidence by itself for disulfides. |
+| **D** | Strongly negative throughout many hydrophobic-looking filters. Filter 5: **[-0.081, -0.105, -0.033, -0.056, -0.076, -0.037, -0.135]**. Conversely, \(W1[13,D,2]=0.148\): other filters recognize the opposing composition. |
+| **E** | Similar opposition: \(W1[24,E,5]=-0.137\), versus \(W1[4,E,3]=0.111\). Acidic residues help distinguish the two feature families. |
+| **F** | Frequently positive in hydrophobic-looking filters: \(W1[25,F,3]=0.124\), \(W1[10,F,3]=0.112\). |
+| **G** | Mixed: \(W1[12,G,3]=0.109\), \(W1[29,G,6]=-0.101\). No compelling glycine-specific motif. |
+| **H** | Often negative in the hydrophobic family, e.g. \(W1[30,H,3]=-0.139\); positive elsewhere, \(W1[3,H,2]=0.099\). |
+| **I** | Broad positive preference: filter 22 has **[0.112, 0.107, 0.036, 0.077, 0.097, 0.049, 0.083]**. Strong evidence for hydrophobic stretches. |
+| **K** | Particularly strong negative weights: \(W1[10,K,2]=-0.167\), \(W1[10,K,5]=-0.181\). Opposing filters have positive entries, e.g. \(W1[13,K,0]=0.127\). |
+| **L** | Broadly positive, especially filter 5: **[0.007, 0.084, 0.048, 0.082, 0.087, 0.078, 0.085]**. This resembles composition detection across a window, not one obligatory leucine. |
+| **M** | Positive in some hydrophobic filters, \(W1[11,M,5]=0.104\), but mixed elsewhere, \(W1[31,M,0]=-0.108\). No clear initiator-methionine detector. |
+| **N** | Often negative in the hydrophobic family: \(W1[5,N,6]=-0.151\). Positive in alternative filters, \(W1[16,N,6]=0.122\). |
+| **P** | Frequently negative in hydrophobic-looking filters: \(W1[6,P,5]=-0.139\). Other filters favor it, \(W1[21,P,2]=0.124\). Compatible with separating helix-compatible stretches from proline-rich alternatives. |
+| **Q** | Often negative in hydrophobic filters, \(W1[11,Q,6]=-0.121\); positive elsewhere, \(W1[14,Q,5]=0.106\). |
+| **R** | Frequently negative alongside K/D/E: \(W1[29,R,0]=-0.145\), versus \(W1[14,R,3]=0.118\). The dominant distinction is not simply positive versus negative charge. |
+| **S** | Mixed, with positive structure in some opposing filters: \(W1[21,S,0]=0.104\), versus \(W1[9,S,1]=-0.094\). |
+| **T** | Mixed: \(W1[16,T,4]=0.110\), \(W1[17,T,3]=-0.115\). Less consistent than I/L/F. |
+| **V** | Frequently positive in hydrophobic filters, including \(W1[30,V,4]=0.138\), though not uniformly. |
+| **W** | Positive in some hydrophobic filters, \(W1[10,W,0]=0.128\), and strongly negative in opposing filters, \(W1[28,W,3]=-0.144\). |
+| **Y** | Similar aromatic opposition: \(W1[5,Y,3]=0.118\), versus \(W1[21,Y,6]=-0.115\). |
+| **Padding** | Channel 20 is always zero on the stated training inputs. Its weights therefore provide no evidence about the learned biological distinction. |
+
+**Convolutional layers.** Several filters repeat broadly similar residue preferences across their seven kernel positions. That supports local physicochemical composition more clearly than a precise sequence motif. The second layer combines these features over an effective **13-residue receptive field**.
+
+For example, second-layer filter 1 positively combines hydrophobic-looking first-layer filter 5:
+
+\[
+W2[1,5,:]=[0.055,0.086,0.017,0.100,0.064,0.102,0.093],
+\]
+
+while suppressing first-layer filter 8, which favors several charged residues:
+
+\[
+W2[1,8,:]=[-0.093,-0.105,-0.097,-0.013,-0.034,-0.043,-0.016].
+\]
+
+**Output layer.** That second-layer feature supports class 1 across much of the segment. For example, channel 1, position 20 corresponds to \(v=90\):
+
+\[
+W3[0,90]=-0.074,\qquad W3[1,90]=0.069.
+\]
+
+Its activation therefore contributes **0.143 toward \(z[1]-z[0]\)**. The readout is position-dependent, but the hydrophobic evidence is not confined to a single narrow location.
+
+The output biases, **−0.007 and 0.006**, provide only a small direct offset toward class 1. They do not disclose class meanings or establish training-class frequencies.
+
+## Reasoning
+
+The strongest biological fit is **recognition of membrane-spanning hydrophobic regions**: I/L/V/F-rich stretches, depletion of charged residues, and frequently unfavorable proline contributions.
+
+Other tasks remain plausible:
+
+- **Signal-peptide detection** also uses hydrophobic stretches. However, these weights do not establish a recognizable cleavage-site rule or an exclusively early hydrophobic region. Moreover, the supplied segment is not stated to begin at the protein’s actual N terminus.
+- **Ordered versus disordered**, **soluble versus insoluble**, or other composition-correlated classifications could produce related preferences.
+- A specific catalytic-site, modification-site, or protein-family classifier is **less directly supported**, because no convincing diagnostic motif emerges from this inspection.
+
+Those alternatives cannot strictly be ruled out. **Weights identify a numerical decision function, not the semantic names of its training labels.** Consequently, the exact historical training task is not uniquely recoverable here.
+
+## Task
+
+**Best guess: transmembrane-region detection—membrane-spanning segments versus non-transmembrane segments.** More specific biological labels are not justified by the weights alone.
+
+## Description
+
+The network appears to favor class 1 for segments containing hydrophobic, charge-depleted local stretches, consistent with transmembrane helices. Class 0 generally receives support from opposing, more charged/polar sequence features.
+
+## Confidence
+
+**60%** for that task hypothesis.

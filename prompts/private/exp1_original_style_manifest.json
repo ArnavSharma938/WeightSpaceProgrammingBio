@@ -1,0 +1,84 @@
+{
+  "private_do_not_submit": true,
+  "created_at": "2026-11-05T02:12:08.663852+00:00",
+  "permutation_seed_hex": "d85778ddaeab2490f0ccea4ccb65c34f702155c9d5daaa3549766a3fb2b9db44",
+  "permutation": [
+    1,
+    0,
+    2
+  ],
+  "rounding": "Python float .3f formatting; nearest, ties-to-even; negative zero retained",
+  "template_sha256": "5712747649da65eb206f36ee38657c1bcca2db913864514e103b7dd29474dc48",
+  "exporter_sha256": "2867f10a402cac780d4c40b80d8aaead5580c3bb61553c7fe786cf502110ca5d",
+  "repository_source_sha256": {
+    "model.py": "6671af065b90fe453837c1302aaa6fbc6ccecd252745131d580e3b3b74ce9962",
+    "common.py": "cfdb5eafc056876f1afb77d5fd971c3a55faf4f3da55738b67a30b81d15d547a",
+    "training.py": "542e2180c8d7c7a9cc59706052a011f001c372f90e2b57b1b6c55cecfbccbd38",
+    "data.py": "57aeace9dca9ed38bf7cb99e3c6e61dd0925e3145a5d037ed929f84a0696b13b"
+  },
+  "torch_version": "2.15.0+cpu",
+  "models": [
+    {
+      "id": "model_001",
+      "prompt_file": "model_001.txt",
+      "task": "transmembrane",
+      "checkpoint": "runs/seed_20261103/transmembrane/checkpoints/best_state_dict.pt",
+      "checkpoint_sha256": "b8a05efc618d5b0f511b8b508bfd3c09961d5e181db4624e31b0ad77e69c710c",
+      "prompt_sha256": "b10d6f75094df3d8ed71f2fc8936313b72c02e6d95ab4de0656ba02daabd0441",
+      "prompt_bytes": 172435,
+      "prompt_characters": 172435,
+      "coverage": {
+        "W1": 4704,
+        "b1": 32,
+        "W2": 7168,
+        "b2": 32,
+        "W3": 4480,
+        "b3": 2
+      },
+      "tensor_count": 6,
+      "scalar_count": 16418
+    },
+    {
+      "id": "model_002",
+      "prompt_file": "model_002.txt",
+      "task": "signal_peptide",
+      "checkpoint": "runs/seed_20261103/signal_peptide/checkpoints/best_state_dict.pt",
+      "checkpoint_sha256": "ac473296ef25f7dd3a7b6ef9fd355aad1550aceec69b67447437b08a174b142b",
+      "prompt_sha256": "8699784d314b9f0b49674031112179ff0b6d07c23d75ca75adde6640a3172c17",
+      "prompt_bytes": 172264,
+      "prompt_characters": 172264,
+      "coverage": {
+        "W1": 4704,
+        "b1": 32,
+        "W2": 7168,
+        "b2": 32,
+        "W3": 4480,
+        "b3": 2
+      },
+      "tensor_count": 6,
+      "scalar_count": 16418
+    },
+    {
+      "id": "model_003",
+      "prompt_file": "model_003.txt",
+      "task": "coiled_coil",
+      "checkpoint": "runs/seed_20261103/coiled_coil/checkpoints/best_state_dict.pt",
+      "checkpoint_sha256": "7445e085784d6a3891fbe640ba2c788c3b679464b292d30968c652aea921db73",
+      "prompt_sha256": "b79a83787650b1bf2d5769c2907fea8b851c5b70221e41df380af052b27eaff1",
+      "prompt_bytes": 172384,
+      "prompt_characters": 172384,
+      "coverage": {
+        "W1": 4704,
+        "b1": 32,
+        "W2": 7168,
+        "b2": 32,
+        "W3": 4480,
+        "b3": 2
+      },
+      "tensor_count": 6,
+      "scalar_count": 16418
+    }
+  ],
+  "mapping_reused_from": "C:\\Users\\arnav.DHEERAJACER\\protein_weight_space_cnns\\prompts\\private\\exp1_manifest.json",
+  "mapping_source_sha256": "927273a8b0e6dd15261e7170fe43f8579c6dfff5977ac695f086ee11ca251ffa"
+}
