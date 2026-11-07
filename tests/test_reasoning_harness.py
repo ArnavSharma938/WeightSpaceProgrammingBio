@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "runner"))
-import pure_reasoning as runner
+import reasoning_harness as runner
 
 
 def events(answer="I am uncertain.", tool=None, complete=True):

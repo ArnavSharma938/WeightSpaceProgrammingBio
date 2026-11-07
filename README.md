@@ -1,65 +1,82 @@
 # Protein weight-space experiments
 
-The initial pure-reasoning runner is `runner/pure_reasoning.py`. It submits
-separately prepared UTF-8 prompt files through fresh `codex exec` processes,
-using `gpt-6.1-sol`, high reasoning effort, neutral instructions, and no native
-tools. It has no Python package dependencies and does not import the CNN code.
-See [runner/README.md](runner/README.md) for exact PowerShell commands,
-isolation checks, logging, retries, and restart recovery.
+The repository contains three trained 16,418-parameter protein CNNs, two completed
+weight-reading experiments, and a generic reasoning harness.
 
-## Prepare Experiment 1 inputs
+## Repository layout
 
-```powershell
-.\.venv\Scripts\python.exe scripts\prepare_reasoning_inputs.py --out prompts/exp1
-```
+~~~text
+data/                                  prepared datasets, audits, and provenance
+prompts/experiment_1_initial/           initial adapted question, three models
+prompts/experiment_2_original_style/    original-style question, same models
+prompts/private/                       checkpoint mappings and hashes; never submit
+runs/seed_20261103/                     CNN checkpoints, training and evaluation
+runs/reasoning_harness/experiment_1_initial/
+runs/reasoning_harness/experiment_2_original_style/
+runner/reasoning_harness.py
+runner/reasoning_harness.toml
+reports/reasoning_experiments_1_and_2.md
+reports/reasoning_harness.md
+reports/cnn_training_report.md
+~~~
 
-This exports the three existing best checkpoints as `model_001.txt` through
-`model_003.txt`, each with the supplied experimental prose and all 16,418
-parameters rounded to three decimals. It verifies architecture and encoding,
-loads only CPU weights, and parses every exported index and scalar back against
-the checkpoint. It does not evaluate a CNN or invoke Codex.
+The experiment report includes all six exact responses. Experiments 1 and 2
+here label the initial and original-style prompt runs of the same CNN task;
+they do not refer to the separate RBM experiment in the original project packet.
 
-The random permutation, checkpoint identities/hashes, prompt hashes, and coverage
-are saved separately in `prompts/private/exp1_manifest.json`. Keep that manifest
-private and never submit it as an experimental message. Existing output or a
-private manifest causes the exporter to stop rather than overwrite either.
+## Reasoning harness
 
-To prepare the corrected original-style question while preserving the original
-anonymous checkpoint identities:
+The harness submits prepared UTF-8 files through fresh codex exec processes,
+using gpt-6.1-sol, high reasoning effort, neutral instructions, and no native
+tools. It has no Python package dependencies or CNN imports.
 
-```powershell
-.\.venv\Scripts\python.exe scripts\prepare_reasoning_inputs.py --out prompts/exp1_original_style --reuse-mapping prompts/private/exp1_manifest.json
-```
+See [the harness documentation](reports/reasoning_harness.md) for commands,
+isolation, logging, retries, quota waiting, interruption recovery, and locking.
 
-The corrected prompts have their own private manifest at
-`prompts/private/exp1_original_style_manifest.json`; original inputs and runs
-remain separate.
+~~~powershell
+.\.venv\Scripts\python.exe runner\reasoning_harness.py check
+.\.venv\Scripts\python.exe runner\reasoning_harness.py status --run-dir runs\reasoning_harness\experiment_2_original_style
+~~~
 
-Exporter tests (no network, inference, or Codex):
+## Prepared prompts
 
-```powershell
+Each model file contains identical factual prose and all six indexed tensors
+rounded to three decimal places. Anonymous model identities match across the
+two prompt folders. The corrected question is the exporter's current template.
+
+For a new output directory while retaining the established identities:
+~~~powershell
+.\.venv\Scripts\python.exe scripts\prepare_reasoning_inputs.py --out prompts\new_batch --reuse-mapping prompts\private\experiment_1_initial_manifest.json
+~~~
+
+Output and a separate private manifest are created exclusively; existing files
+are never overwritten. This command neither evaluates a CNN nor invokes Codex.
+
+~~~powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p test_prepare_reasoning_inputs.py -v
-```
+~~~
 
-This project implements and trains only the three CNN classifiers specified in
-`Experiment 1 CNN (also experiment 4)` of the supplied experiment packet:
+## Training and data
 
-1. N-terminal cleavable signal peptide vs. no signal peptide.
-2. Annotated transmembrane segment (at least 15 contiguous `M` labels) vs. no
-   `M` label, among SignalP `NO_SP` records.
-3. Coiled-coil window (at least 21 contiguous register labels `a`-`g`) vs.
-   windows from CoCoNat negative proteins.
+The trained tasks are signal-peptide detection, transmembrane-segment detection,
+and coiled-coil detection. All inputs have 70 canonical amino acids in the order
+ACDEFGHIKLMNPQRSTVWY, followed by an unused padding channel. The exact CNN is
+Conv1d(21,32,7,padding=3), ReLU, Conv1d(32,32,7,padding=3), ReLU,
+channel-major flatten, and Linear(2240,2).
 
-Every input is exactly 70 canonical amino acids. The model is exactly
-Conv1d(21,32,7,padding=3), ReLU, Conv1d(32,32,7,padding=3), ReLU, channel-major
-flatten, and Linear(2240,2), for 16,418 trainable parameters.
+Prepared arrays, source IDs, split assignments, audits, and manifests are directly
+in data/. The NPZ arrays and private example lists remain ignored by Git, as
+before; source hashes, URLs, and preparation rules provide reproducibility.
 
-## Reproduce
+Raw source downloads are needed only to rebuild the prepared datasets. They live
+outside the repository in the local cache:
+%LOCALAPPDATA%/protein_weight_space_cnns/source_data on Windows, or
+~/.cache/protein_weight_space_cnns/source_data otherwise. The downloader verifies
+pinned SHA-256 hashes and reuses valid cached files. Training/evaluation from
+existing prepared arrays does not require this cache.
 
-Windows PowerShell, Python 3.10-3.12, and an internet connection are required
-for a clean run. The checked-in raw files can also be reused offline.
-
-```powershell
+To recreate the environment and dataset, then train and evaluate:
+~~~powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m pip install -e . --no-deps
@@ -67,26 +84,24 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe scripts\cnns.py prepare
 .\.venv\Scripts\python.exe scripts\cnns.py train --device cpu
 .\.venv\Scripts\python.exe scripts\cnns.py evaluate --device cpu
-```
+~~~
 
-Or run `powershell -ExecutionPolicy Bypass -File scripts\reproduce.ps1`.
+The editable install can regenerate ignored .egg-info packaging metadata; those
+generated files do not belong in source control. Alternatively run
+scripts/reproduce.ps1 for the complete workflow. Existing trained checkpoints
+remain under runs/seed_20261103/.
 
-The download script verifies pinned SHA-256 hashes. Preparation writes the
-resolved examples, private identifiers, extraction decisions, split audits,
-and dataset manifest under `data/processed/`. Training writes one immutable run
-directory per task under `runs/`. The training report is `reports/cnn_training_report.md`.
+## Frozen dataset policy
 
-## Frozen split and extraction policy
+- SignalP partitions 0, 1, and 2 are train, validation, and test.
+- CoCoNat folds 1-9 are train, fold 0 is validation, and the publisher blind set
+  is test.
+- CoCoNat positive windows are centered on the longest register run of at least
+  21 residues; negative windows are centered, one per source protein.
+- Transmembrane positives require at least 15 contiguous M annotations.
+- Training examples are deterministically balanced; held-out prevalence is kept.
+- Training windows at 80% or greater aligned identity to held-out windows are
+  removed; duplicate IDs/sequences are audited.
 
-- SignalP partitions 0, 1, and 2 are train, validation, and test respectively.
-- CoCoNat folds 1-9 are training, fold 0 is validation, and the publisher's
-  blind-test files are test.
-- CoCoNat positive windows are centered on the midpoint of the longest
-  contiguous register (`a`-`g`) run; ties use the earliest run. Bounds are
-  shifted only enough to obtain 70 residues. Negative windows are centered.
-- Training sets are downsampled deterministically to equal positive/negative
-  counts. Validation and test prevalence is retained.
-- Exact ID/sequence overlap is audited. Training windows with at least 80%
-  aligned identity to a validation or test window are removed before balancing.
-
-See the final report for counts, metrics, controls, limitations, and provenance.
+See [the training report](reports/cnn_training_report.md) for counts, metrics,
+controls, hashes, and limitations.

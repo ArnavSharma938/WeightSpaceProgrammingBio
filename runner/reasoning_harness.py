@@ -1,4 +1,4 @@
-"""Initial pure-reasoning experiments: one immutable message, one fresh codex exec.
+"""Reasoning harness: one immutable message, one fresh codex exec.
 
 Python 3.11+ standard library only. No model/data/checkpoint dependencies.
 The retry loop handles failed transports, never answer quality or follow-up turns.
@@ -111,7 +111,7 @@ def check(cli, cwd):
     for flag in ("--ignore-user-config", "--ignore-rules", "--ephemeral", "--strict-config", "--json", "--output-last-message"):
         if flag not in help_text:
             raise ProtocolError(f"Installed CLI lacks required isolation flag {flag}")
-    settings = tomllib.loads((HERE / "pure_reasoning.toml").read_text(encoding="utf-8"))
+    settings = tomllib.loads((HERE / "reasoning_harness.toml").read_text(encoding="utf-8"))
     if settings.get("model") != MODEL or settings.get("model_reasoning_effort") != "high":
         raise ProtocolError("Protocol requires gpt-6.1-sol and high reasoning effort.")
     settings["model_instructions_file"] = str(HERE / "neutral.md")
@@ -375,7 +375,7 @@ def attempt(cli, settings, prompt, directory, timeout, policy=None, transient_fa
     save(directory / "attempt.json", result)
     interrupted = timed_out = False
     process = None
-    with tempfile.TemporaryDirectory(prefix="weight_space_pure_") as workspace:
+    with tempfile.TemporaryDirectory(prefix="weight_space_reasoning_") as workspace:
         Path(workspace, ".git").mkdir()
         with (directory / "events.jsonl").open("wb") as out, (directory / "stderr.txt").open("wb") as err:
             try:
@@ -478,7 +478,7 @@ def run(root, prompts, args):
                 (folder / "prompt.txt").write_bytes(raw)
                 inputs.append({"id": identity, "source": str(Path(path).resolve()),
                                "sha256": digest(raw), "status": "pending"})
-            state = {"created_at": stamp(), "protocol": "initial-pure-reasoning-v1", "inputs": inputs}
+            state = {"created_at": stamp(), "protocol": "reasoning-harness-v1", "inputs": inputs}
             save(root / "state.json", state)
         state["recovery_policy"] = retry_policy(args)
         save(root / "state.json", state)
@@ -487,7 +487,7 @@ def run(root, prompts, args):
             print("All inputs already finished; no Codex request made.")
             return
         cli = executable(args.codex)
-        with tempfile.TemporaryDirectory(prefix="pure_check_") as cwd:
+        with tempfile.TemporaryDirectory(prefix="reasoning_harness_check_") as cwd:
             Path(cwd, ".git").mkdir()
             verified = check(cli, cwd)
         if (root / "execution.json").exists():
@@ -550,7 +550,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         if args.command == "check":
-            with tempfile.TemporaryDirectory(prefix="pure_check_") as cwd:
+            with tempfile.TemporaryDirectory(prefix="reasoning_harness_check_") as cwd:
                 Path(cwd, ".git").mkdir()
                 verified = check(executable(args.codex), cwd)
             print(json.dumps(verified, indent=2))

@@ -11,7 +11,7 @@ import torch.nn.functional as functional
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from .common import PROCESSED_DIR, RUNS_DIR, SEED, seed_everything, sha256, write_json
+from .common import DATA_DIR, RUNS_DIR, SEED, seed_everything, sha256, write_json
 from .metrics import classification_metrics
 from .model import ProteinCNN
 
@@ -26,7 +26,7 @@ def resolve_device(requested: str) -> torch.device:
 
 
 def load_task(task: str) -> dict[str, np.ndarray]:
-    path = PROCESSED_DIR / f"{task}.npz"
+    path = DATA_DIR / f"{task}.npz"
     if not path.exists():
         raise FileNotFoundError(f"Missing {path}; run scripts/cnns.py prepare first")
     with np.load(path) as archive:

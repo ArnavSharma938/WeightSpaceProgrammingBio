@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from .common import ALPHABET, PROCESSED_DIR, REPORTS_DIR, RUNS_DIR, SEED, TASKS, sha256, write_json
+from .common import ALPHABET, DATA_DIR, REPORTS_DIR, RUNS_DIR, SEED, TASKS, sha256, write_json
 from .metrics import classification_metrics
 from .model import ProteinCNN
 from .training import load_task, predict, resolve_device
@@ -109,8 +109,8 @@ def _fmt(value: object, digits: int = 3) -> str:
 
 
 def build_report(results: dict[str, dict]) -> Path:
-    preparation = json.loads((PROCESSED_DIR / "preparation_summary.json").read_text(encoding="utf-8"))
-    raw = json.loads((PROCESSED_DIR / "raw_data_manifest.json").read_text(encoding="utf-8"))
+    preparation = json.loads((DATA_DIR / "preparation_summary.json").read_text(encoding="utf-8"))
+    raw = json.loads((DATA_DIR / "raw_data_manifest.json").read_text(encoding="utf-8"))
     training = {
         task: json.loads((RUNS_DIR / f"seed_{SEED}" / task / "training_summary.json").read_text(encoding="utf-8"))
         for task in TASKS

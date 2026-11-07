@@ -2,5 +2,7 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
-data/processed/
+*.egg-info/
+data/*.npz
+data/*_private_examples.jsonl
 runs/*/checkpoints/

@@ -1,4 +1,4 @@
-# Initial pure-reasoning weight-space experiments; execution policy, never prompt text.
+# Reasoning harness execution policy, never prompt text.
 model = "gpt-6.1-sol"
 model_provider = "openai"
 model_reasoning_effort = "high"

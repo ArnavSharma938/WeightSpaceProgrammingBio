@@ -1,0 +1,26 @@
+{
+  "coconat_blindtest_negative.fasta": {
+    "bytes": 95124,
+    "sha256": "42d3826c61619210e5a53e932f624f8f4c759c7654fcad9b0e752bc2f39304f0"
+  },
+  "coconat_blindtest_positive.annot.fasta": {
+    "bytes": 431701,
+    "sha256": "222cf64f306594f2d87250ddd469ac9b8d1bf714c1d4dd6f02e299c4ea493e97"
+  },
+  "coconat_cv_sets.tgz": {
+    "bytes": 44393,
+    "sha256": "844cf7b442d4bfe6836648c42fc0bcae052aa940c54da9c7b6f24171baf5a99f"
+  },
+  "coconat_training_negative.fasta": {
+    "bytes": 3719675,
+    "sha256": "5b408e95bfb86bab06a5b96fec1ce8e344483221fd391351ecb16575265ed09e"
+  },
+  "coconat_training_positive.annot.fasta": {
+    "bytes": 3430458,
+    "sha256": "059dcdcbdec481be5160b5893f354ea163edfdcd22faa364d38ec5aaffa53ae4"
+  },
+  "signalp6_train_set.fasta": {
+    "bytes": 3357917,
+    "sha256": "18ebf6dcc43ed4d9197155d9e9a405e3ac040ec3bcee05fc570d0e88f439642c"
+  }
+}

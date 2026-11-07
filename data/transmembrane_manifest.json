@@ -1,0 +1,76 @@
+{
+  "audit": {
+    "close_homology_filter": {
+      "pre_filter_train_max_identity_summary": {
+        "max": 0.3,
+        "mean": 0.2106680929689779,
+        "median": 0.21428571428571427
+      },
+      "removed": [],
+      "removed_by_label": {},
+      "removed_count": 0,
+      "threshold": 0.8
+    },
+    "extraction": {
+      "discarded_noncanonical_or_wrong_length": 192,
+      "discarded_tm_short_M_run": 151
+    },
+    "overlap_after_filtering": {
+      "train_vs_test": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      },
+      "train_vs_validation": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      },
+      "validation_vs_test": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      }
+    },
+    "overlap_before_filtering": {
+      "train_vs_test": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      },
+      "train_vs_validation": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      },
+      "validation_vs_test": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      }
+    },
+    "raw_counts": {
+      "test": {
+        "0": 4337,
+        "1": 1037
+      },
+      "train": {
+        "0": 3886,
+        "1": 521
+      },
+      "validation": {
+        "0": 5081,
+        "1": 549
+      }
+    }
+  },
+  "counts": {
+    "test": {
+      "0": 4337,
+      "1": 1037
+    },
+    "train": {
+      "0": 521,
+      "1": 521
+    },
+    "validation": {
+      "0": 5081,
+      "1": 549
+    }
+  },
+  "task": "transmembrane"
+}

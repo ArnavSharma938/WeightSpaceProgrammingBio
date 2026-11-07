@@ -8,7 +8,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .common import ALPHABET, PROCESSED_DIR, RAW_DIR, SEED, SEQUENCE_LENGTH, TASKS, encode, sha256, write_json
+from .common import ALPHABET, DATA_DIR, RAW_DIR, SEED, SEQUENCE_LENGTH, TASKS, encode, sha256, write_json
 
 CANONICAL = set(ALPHABET)
 SP_ANNOTATION = {"SP": "S", "TAT": "T", "TATLIPO": "T", "LIPO": "L", "PILIN": "P"}
@@ -272,13 +272,13 @@ def save_task(task: str, splits: dict[str, list[Example]], audit: dict) -> dict:
                     "extraction": example.extraction,
                 }
             )
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(PROCESSED_DIR / f"{task}.npz", **arrays)
-    with (PROCESSED_DIR / f"{task}_private_examples.jsonl").open("w", encoding="utf-8") as handle:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(DATA_DIR / f"{task}.npz", **arrays)
+    with (DATA_DIR / f"{task}_private_examples.jsonl").open("w", encoding="utf-8") as handle:
         for record in private_records:
             handle.write(json.dumps(record, sort_keys=True) + "\n")
     manifest = {"task": task, "counts": counts, "audit": audit}
-    write_json(PROCESSED_DIR / f"{task}_manifest.json", manifest)
+    write_json(DATA_DIR / f"{task}_manifest.json", manifest)
     return manifest
 
 
@@ -303,6 +303,6 @@ def prepare_all() -> dict:
         for path in sorted(RAW_DIR.iterdir())
         if path.is_file()
     }
-    write_json(PROCESSED_DIR / "raw_data_manifest.json", raw_manifest)
-    write_json(PROCESSED_DIR / "preparation_summary.json", manifests)
+    write_json(DATA_DIR / "raw_data_manifest.json", raw_manifest)
+    write_json(DATA_DIR / "preparation_summary.json", manifests)
     return manifests

@@ -1,0 +1,82 @@
+{
+  "audit": {
+    "close_homology_filter": {
+      "pre_filter_train_max_identity_summary": {
+        "max": 0.44285714285714284,
+        "mean": 0.17328311319798667,
+        "median": 0.17142857142857143
+      },
+      "removed": [],
+      "removed_by_label": {},
+      "removed_count": 0,
+      "threshold": 0.8
+    },
+    "extraction": {
+      "test_negative_noncanonical_or_short": 2,
+      "test_positive_no_21_register_run": 347,
+      "test_positive_noncanonical_or_short": 6,
+      "train_negative_noncanonical_or_short": 105,
+      "train_positive_no_21_register_run": 1582,
+      "train_positive_noncanonical_or_short": 2,
+      "validation_negative_noncanonical_or_short": 12,
+      "validation_positive_no_21_register_run": 137
+    },
+    "overlap_after_filtering": {
+      "train_vs_test": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      },
+      "train_vs_validation": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      },
+      "validation_vs_test": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      }
+    },
+    "overlap_before_filtering": {
+      "train_vs_test": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      },
+      "train_vs_validation": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      },
+      "validation_vs_test": {
+        "identical_sequences": 0,
+        "shared_ids": 0
+      }
+    },
+    "raw_counts": {
+      "test": {
+        "0": 316,
+        "1": 47
+      },
+      "train": {
+        "0": 8031,
+        "1": 427
+      },
+      "validation": {
+        "0": 892,
+        "1": 43
+      }
+    }
+  },
+  "counts": {
+    "test": {
+      "0": 316,
+      "1": 47
+    },
+    "train": {
+      "0": 427,
+      "1": 427
+    },
+    "validation": {
+      "0": 892,
+      "1": 43
+    }
+  },
+  "task": "coiled_coil"
+}

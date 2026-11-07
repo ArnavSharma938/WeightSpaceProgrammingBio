@@ -14,8 +14,9 @@ ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
 PAD_INDEX = 20
 SEQUENCE_LENGTH = 70
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-RAW_DIR = PROJECT_ROOT / "data" / "raw"
-PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
+# Downloaded sources are a reproducible local cache, not repository artifacts.
+RAW_DIR = Path(os.environ.get("LOCALAPPDATA", Path.home() / ".cache")) / "protein_weight_space_cnns" / "source_data"
+DATA_DIR = PROJECT_ROOT / "data"
 RUNS_DIR = PROJECT_ROOT / "runs"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 TASKS = ("signal_peptide", "transmembrane", "coiled_coil")

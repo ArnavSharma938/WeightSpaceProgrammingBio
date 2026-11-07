@@ -189,10 +189,10 @@ Confidence: <0-100>%"""
                 exporter.choose_mapping(self.records(), path)
 
     def test_only_instruction_block_changes_from_original_prepared_inputs(self):
-        manifest = json.loads((exporter.ROOT / "prompts/private/exp1_manifest.json").read_text(encoding="utf-8"))
+        manifest = json.loads((exporter.ROOT / "prompts/private/experiment_1_initial_manifest.json").read_text(encoding="utf-8"))
         records = {record["checkpoint"]: record for record in exporter.load_checkpoints()}
         for entry in manifest["models"]:
-            old_raw = (exporter.ROOT / "prompts/exp1" / entry["prompt_file"]).read_bytes()
+            old_raw = (exporter.ROOT / "prompts/experiment_1_initial" / entry["prompt_file"]).read_bytes()
             self.assertEqual(exporter.sha(old_raw), entry["prompt_sha256"])
             state = records[entry["checkpoint"]]["state"]
             corrected = exporter.render(state)
